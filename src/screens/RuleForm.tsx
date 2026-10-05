@@ -111,7 +111,21 @@ export function RuleForm({
         <OptionList label="Action" options={ACTION_OPTIONS} value={draft.action} onChange={(action) => update({ action })} />
       </FormSection>
 
-      <FormSection index="2.2" label="Who">
+      <FormSection index="2.2" label="Calls">
+        {draft.target === 'hidden' ? (
+          <p className="px-6 py-4 text-sm font-medium text-ink/60">
+            Hidden numbers only exist on incoming calls, so this rule applies to incoming calls.
+          </p>
+        ) : (
+          <OptionList
+            label="Calls"
+            options={DIRECTION_OPTIONS}
+            value={draft.direction}
+            onChange={(direction) => update({ direction })}
+          />
+        )}
+      </FormSection>
+      <FormSection index="2.3" label="Who">
         <OptionList label="Who" options={TARGET_OPTIONS} value={draft.target} onChange={(target) => update({ target })} />
         {draft.target === 'number' && (
           <div className="swiss-diagonal space-y-6 border-t-2 border-ink bg-muted px-6 py-6">
@@ -145,20 +159,6 @@ export function RuleForm({
         )}
       </FormSection>
 
-      <FormSection index="2.3" label="Calls">
-        {draft.target === 'hidden' ? (
-          <p className="px-6 py-4 text-sm font-medium text-ink/60">
-            Hidden numbers only exist on incoming calls, so this rule applies to incoming calls.
-          </p>
-        ) : (
-          <OptionList
-            label="Calls"
-            options={DIRECTION_OPTIONS}
-            value={draft.direction}
-            onChange={(direction) => update({ direction })}
-          />
-        )}
-      </FormSection>
       <div className="border-t-4 border-ink" />
     </FormScreen>
   )

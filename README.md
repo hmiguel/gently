@@ -5,9 +5,22 @@ Android app that blocks outgoing and incoming calls, protected by an access code
 - **Rules:** each rule says *block* or *allow*, *outgoing / incoming / both*, and *who*: one number
   (picked from contacts or typed), anyone, or hidden callers. A rule for a specific number wins over a
   rule for anyone, so "block all outgoing" + "allow Mom" works as an allowlist
-- **Access code:** 6 digits, stored as a salted PBKDF2 hash, with an escalating lockout after 5 wrong attempts
-- **Log:** every blocked attempt, with time and number
+- **Access code:** 6 digits, stored as a salted PBKDF2 hash, with an escalating lockout after 5 wrong attempts.
+  The app locks whenever it leaves the screen; the code can be changed in Settings (current code required)
+- **Log:** every blocked attempt, with time, number and direction
+- **Settings** (⚙): change the access code, see and re-grant permissions
+- **About** (ⓘ): how it works, what each permission is for, privacy, version
 - Emergency numbers are never blocked (Android enforces this)
+
+## Permissions
+
+| Permission | Why |
+|---|---|
+| Call redirection role | Cancel outgoing calls before they connect |
+| Caller ID & spam (call screening) role | Reject incoming calls before the phone rings |
+| `READ_CONTACTS` | Android only passes calls from saved contacts to a screening app that holds it. Gently never reads the address book; numbers are added through the system contact picker |
+
+There is **no `INTERNET` permission**: rules and the log never leave the device.
 
 ## Stack
 
@@ -18,6 +31,8 @@ Android app that blocks outgoing and incoming calls, protected by an access code
   - `GentlyScreeningService` uses `CallScreeningService` to reject matching incoming calls before they ring
   - `RuleStore` holds the rules and log in SharedPreferences, so blocking keeps working while the app is closed
   - `CallGuardPlugin` is the bridge to the UI (`src/plugins/callguard.ts`)
+  - `ContactPickerPlugin` opens the system contact picker for a single number (`src/plugins/contacts.ts`)
+- Screens: `src/screens/` (Status, Rules + RuleForm, Log, Settings, About, LockScreen)
 
 The `CallGuard` plugin interface is platform-neutral to make a future iOS port easier, but note that
 iOS has no API for blocking outgoing calls.
@@ -37,7 +52,19 @@ npm run build && npx cap sync android
 cd android && ./gradlew assembleDebug    # or: npx cap run android
 ```
 
-On first launch: set the access code, tap **Grant access**, and choose Gently as the call redirection app.
+On first launch: set the access code, create a rule, then use **Grant access** on the Status screen:
+choose Gently as the call redirection app (outgoing) and/or the caller ID & spam app, then allow Contacts
+(incoming).
+
+Install on a phone without a cable via Wireless debugging (Android 11+):
+
+```sh
+adb pair <ip>:<pairing-port> <code>   # from "Pair device with pairing code"
+adb connect <ip>:<port>               # from the Wireless debugging screen
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+Xiaomi/HyperOS also needs **Install via USB** enabled in Developer options.
 
 ## Icons & store assets
 

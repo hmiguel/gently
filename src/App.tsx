@@ -16,7 +16,7 @@ import { StatusScreen } from './screens/StatusScreen'
 type Phase = 'loading' | 'setup' | 'locked' | 'open'
 
 /** Full-screen pages layered over the tabs. A rule with `id: null` is a new one. */
-type Overlay = { kind: 'rule'; id: string | null } | { kind: 'about' }
+type Overlay = { kind: 'rule'; id: string | null } | { kind: 'about'; notice?: string } | { kind: 'changeCode' }
 
 export default function App() {
   const [phase, setPhase] = useState<Phase>('loading')
@@ -172,7 +172,22 @@ export default function App() {
 
       <TabBar active={tab} onChange={setTab} />
 
-      {overlay?.kind === 'about' && <AboutScreen onClose={() => setOverlay(null)} />}
+      {overlay?.kind === 'about' && (
+        <AboutScreen
+          notice={overlay.notice}
+          onChangeCode={() => setOverlay({ kind: 'changeCode' })}
+          onClose={() => setOverlay(null)}
+        />
+      )}
+      {overlay?.kind === 'changeCode' && (
+        <div className="fixed inset-0 z-40 animate-sheet-in bg-paper">
+          <LockScreen
+            mode="change"
+            onCancel={() => setOverlay({ kind: 'about' })}
+            onUnlock={() => setOverlay({ kind: 'about', notice: 'Access code changed' })}
+          />
+        </div>
+      )}
       {rules && overlay?.kind === 'rule' && (
         <RuleForm
           key={overlay.id ?? 'new'}

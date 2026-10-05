@@ -5,6 +5,7 @@ import { TabBar, type Tab } from './components/TabBar'
 import { tap } from './lib/haptics'
 import { hasPin } from './lib/pin'
 import { CallGuard, type LogEntry, type Permissions, type Rules, type Status } from './plugins/callguard'
+import { ContactPicker } from './plugins/contacts'
 import { LockScreen } from './screens/LockScreen'
 import { LogScreen } from './screens/LogScreen'
 import { RulesScreen } from './screens/RulesScreen'
@@ -17,8 +18,17 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('status')
   const [status, setStatus] = useState<Status | null>(null)
   const [log, setLog] = useState<LogEntry[]>([])
-  // The permission dialog backgrounds the app; that must not lock it.
+  // System dialogs (permissions, contact picker) background the app; that must not lock it.
   const expectingSystemDialog = useRef(false)
+
+  const withSystemDialog = useCallback(async <T,>(open: () => Promise<T>) => {
+    expectingSystemDialog.current = true
+    try {
+      return await open()
+    } finally {
+      expectingSystemDialog.current = false
+    }
+  }, [])
 
   const refresh = useCallback(async () => {
     const [s, l] = await Promise.all([CallGuard.getStatus(), CallGuard.getLog()])
@@ -50,13 +60,10 @@ export default function App() {
   }
 
   const requestPermission = async (direction: keyof Permissions) => {
-    expectingSystemDialog.current = true
-    try {
-      setStatus(await CallGuard.requestPermission({ direction }))
-    } finally {
-      expectingSystemDialog.current = false
-    }
+    setStatus(await withSystemDialog(() => CallGuard.requestPermission({ direction })))
   }
+
+  const pickContact = async () => (await withSystemDialog(() => ContactPicker.pickPhone())).contact
 
   if (phase === 'loading') return <div className="h-full bg-paper" />
   if (phase !== 'open') {
@@ -112,7 +119,7 @@ export default function App() {
                 onRequestPermission={requestPermission}
               />
             )}
-            {tab === 'rules' && <RulesScreen rules={rules} onChange={saveRules} />}
+            {tab === 'rules' && <RulesScreen rules={rules} onChange={saveRules} onPickContact={pickContact} />}
             {tab === 'log' && (
               <LogScreen
                 log={log}

@@ -1,8 +1,9 @@
-import { Plus, X } from 'lucide-react'
+import { BookUser, Plus, X } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
-import { ScreenHeader, SectionLabel } from '../components/ui'
+import { Button, ScreenHeader, SectionLabel } from '../components/ui'
 import { tap } from '../lib/haptics'
 import type { Direction, Mode, NumberEntry, Rules } from '../plugins/callguard'
+import type { PickedContact } from '../plugins/contacts'
 
 const DIRECTIONS: { id: Direction; title: string }[] = [
   { id: 'outgoing', title: 'Outgoing' },
@@ -18,27 +19,52 @@ const MODES: { id: Mode; title: string; description: string }[] = [
 
 const digitsOf = (n: string) => n.replace(/\D/g, '')
 
-export function RulesScreen({ rules, onChange }: { rules: Rules; onChange: (rules: Rules) => void }) {
+export function RulesScreen({
+  rules,
+  onChange,
+  onPickContact,
+}: {
+  rules: Rules
+  onChange: (rules: Rules) => void
+  onPickContact: () => Promise<PickedContact | null>
+}) {
   const [number, setNumber] = useState('')
   const [label, setLabel] = useState('')
   const [error, setError] = useState<string | null>(null)
 
-  function add(e: FormEvent) {
-    e.preventDefault()
-    const trimmed = number.trim()
+  /** Adds an entry to the top of the list; returns false (with an error shown) if rejected. */
+  function addEntry(rawNumber: string, rawLabel?: string) {
+    const trimmed = rawNumber.trim()
     if (digitsOf(trimmed).length < 3) {
       setError('Enter a valid number')
-      return
+      return false
     }
     if (rules.numbers.some((n) => digitsOf(n.number) === digitsOf(trimmed))) {
       setError('Already on the list')
-      return
+      return false
     }
-    const entry: NumberEntry = { number: trimmed, ...(label.trim() && { label: label.trim() }) }
+    const name = rawLabel?.trim()
+    const entry: NumberEntry = { number: trimmed, ...(name && { label: name }) }
     onChange({ ...rules, numbers: [entry, ...rules.numbers] })
-    setNumber('')
-    setLabel('')
     setError(null)
+    return true
+  }
+
+  function add(e: FormEvent) {
+    e.preventDefault()
+    if (addEntry(number, label)) {
+      setNumber('')
+      setLabel('')
+    }
+  }
+
+  async function pick() {
+    try {
+      const contact = await onPickContact()
+      if (contact) addEntry(contact.number, contact.name)
+    } catch {
+      setError('Could not open contacts')
+    }
   }
 
   function remove(entry: NumberEntry) {
@@ -155,7 +181,13 @@ export function RulesScreen({ rules, onChange }: { rules: Rules; onChange: (rule
           <p className="mt-3 text-sm font-medium">The list is ignored while every call is blocked.</p>
         )}
 
-        <form onSubmit={add} className="mt-6 flex items-end gap-3">
+        <Button variant="secondary" className="mt-6" onClick={pick}>
+          From contacts <BookUser strokeWidth={2.5} className="size-5" />
+        </Button>
+
+        <p className="text-label mt-8 text-ink/60">Or type a number</p>
+
+        <form onSubmit={add} className="mt-2 flex items-end gap-3">
           <div className="flex-1 space-y-4">
             <label className="block">
               <span className="text-label text-ink/60">Phone number</span>

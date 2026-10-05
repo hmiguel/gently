@@ -2,10 +2,16 @@ import { Plus, X } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { ScreenHeader, SectionLabel } from '../components/ui'
 import { tap } from '../lib/haptics'
-import type { Mode, NumberEntry, Rules } from '../plugins/callguard'
+import type { Direction, Mode, NumberEntry, Rules } from '../plugins/callguard'
+
+const DIRECTIONS: { id: Direction; title: string }[] = [
+  { id: 'outgoing', title: 'Outgoing' },
+  { id: 'incoming', title: 'Incoming' },
+  { id: 'both', title: 'Both' },
+]
 
 const MODES: { id: Mode; title: string; description: string }[] = [
-  { id: 'all', title: 'All calls', description: 'Block every outgoing call' },
+  { id: 'all', title: 'All calls', description: 'Block every call' },
   { id: 'blocklist', title: 'Blocklist', description: 'Block only the numbers below' },
   { id: 'allowlist', title: 'Allowlist', description: 'Allow only the numbers below' },
 ]
@@ -46,7 +52,43 @@ export function RulesScreen({ rules, onChange }: { rules: Rules; onChange: (rule
     <>
       <ScreenHeader index="02" label="Rules" title="Rules." />
 
+      <section className="border-t-4 border-ink">
+        <div className="px-6 py-4">
+          <SectionLabel index="2.1">Direction</SectionLabel>
+        </div>
+        {/* Segmented control: the black gap is the ruling between cells. */}
+        <div
+          className="grid grid-cols-3 gap-[2px] border-t-2 border-ink bg-ink"
+          role="radiogroup"
+          aria-label="Calls to block"
+        >
+          {DIRECTIONS.map((direction) => {
+            const selected = rules.direction === direction.id
+            return (
+              <button
+                key={direction.id}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                onClick={() => {
+                  tap()
+                  onChange({ ...rules, direction: direction.id })
+                }}
+                className={`flex h-16 items-center justify-center text-xs font-bold uppercase tracking-[0.15em] transition-colors duration-150 ease-linear ${
+                  selected ? 'bg-ink text-paper' : 'bg-paper active:bg-muted'
+                }`}
+              >
+                {direction.title}
+              </button>
+            )
+          })}
+        </div>
+      </section>
+
       <section className="border-t-4 border-ink" role="radiogroup" aria-label="Blocking mode">
+        <div className="border-b-2 border-ink px-6 py-4">
+          <SectionLabel index="2.2">Mode</SectionLabel>
+        </div>
         {MODES.map((mode) => {
           const selected = rules.mode === mode.id
           return (
@@ -76,11 +118,37 @@ export function RulesScreen({ rules, onChange }: { rules: Rules; onChange: (rule
             </button>
           )
         })}
+        {rules.direction !== 'outgoing' && (
+          <button
+            type="button"
+            role="switch"
+            aria-checked={rules.blockHidden}
+            onClick={() => {
+              tap()
+              onChange({ ...rules, blockHidden: !rules.blockHidden })
+            }}
+            className="flex w-full items-center justify-between gap-4 border-b-2 border-ink bg-paper px-6 py-5 text-left active:bg-muted"
+          >
+            <span>
+              <span className="block text-lg font-black uppercase tracking-tight">Hidden numbers</span>
+              <span className="mt-1 block text-sm font-medium text-ink/60">
+                {rules.blockHidden ? 'Incoming private calls are rejected' : 'Incoming private calls ring normally'}
+              </span>
+            </span>
+            {/* Rectangular switch: the knob snaps, it doesn't glide. */}
+            <span
+              aria-hidden
+              className={`flex h-7 w-12 shrink-0 border-4 border-ink p-0.5 ${rules.blockHidden ? 'justify-end bg-ink' : 'justify-start'}`}
+            >
+              <span className={`size-3.5 ${rules.blockHidden ? 'bg-accent' : 'bg-ink'}`} />
+            </span>
+          </button>
+        )}
       </section>
 
       <section className={`swiss-diagonal border-b-4 border-ink bg-muted px-6 py-8 ${listUnused ? 'opacity-50' : ''}`}>
         <div className="flex items-baseline justify-between">
-          <SectionLabel index="2.1">Numbers</SectionLabel>
+          <SectionLabel index="2.3">Numbers</SectionLabel>
           <span className="text-label tabular-nums">{String(rules.numbers.length).padStart(2, '0')}</span>
         </div>
         {listUnused && (

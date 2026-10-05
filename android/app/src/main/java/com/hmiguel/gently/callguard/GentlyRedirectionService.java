@@ -20,8 +20,8 @@ public class GentlyRedirectionService extends CallRedirectionService {
         String number = handle.getSchemeSpecificPart();
         RuleStore store = new RuleStore(this);
 
-        if (!isEmergency(number) && store.shouldBlock(number)) {
-            store.appendLog(number);
+        if (!isEmergency(number) && store.shouldBlockOutgoing(number)) {
+            store.appendLog(number, RuleStore.OUT);
             cancelCall();
         } else {
             placeCallUnmodified();

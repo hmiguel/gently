@@ -1,11 +1,35 @@
 import { ArrowRight, ShieldAlert } from 'lucide-react'
 import { Button, ScreenHeader, Stat } from '../components/ui'
-import type { LogEntry, Mode, Status } from '../plugins/callguard'
+import {
+  requiredPermissions,
+  type Direction,
+  type LogEntry,
+  type Mode,
+  type Permissions,
+  type Status,
+} from '../plugins/callguard'
 
 const MODE_NAMES: Record<Mode, string> = {
   all: 'All',
   blocklist: 'Block',
   allowlist: 'Allow',
+}
+
+const DIRECTION_NAMES: Record<Direction, string> = {
+  outgoing: 'Out',
+  incoming: 'In',
+  both: 'Both',
+}
+
+const PERMISSION_TEXT: Record<keyof Permissions, { title: string; body: string }> = {
+  outgoing: {
+    title: 'Outgoing: access required',
+    body: 'Allow Gently to screen outgoing calls. Choose Gently as the call redirection app.',
+  },
+  incoming: {
+    title: 'Incoming: access required',
+    body: 'Allow Gently to screen incoming calls. Choose Gently as the caller ID & spam app.',
+  },
 }
 
 function isToday(ts: number) {
@@ -21,9 +45,10 @@ export function StatusScreen({
   status: Status
   log: LogEntry[]
   onToggle: () => void
-  onRequestPermission: () => void
+  onRequestPermission: (direction: keyof Permissions) => void
 }) {
-  const active = status.enabled && status.hasPermission
+  const missing = requiredPermissions(status.direction).filter((p) => !status.permissions[p])
+  const active = status.enabled && missing.length === 0
 
   return (
     <>
@@ -50,22 +75,27 @@ export function StatusScreen({
         </div>
       </div>
 
-      {!status.hasPermission && (
-        <section className="border-y-4 border-ink bg-accent px-6 py-6 text-paper">
+      {missing.map((permission, i) => (
+        <section
+          key={permission}
+          className={`border-b-4 border-ink bg-accent px-6 py-6 text-paper ${i === 0 ? 'border-t-4' : ''}`}
+        >
           <div className="flex items-start gap-4">
             <ShieldAlert strokeWidth={2.5} className="size-8 shrink-0" />
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.15em]">Permission required</p>
-              <p className="mt-2 text-sm font-medium">
-                Gently must be allowed to screen outgoing calls before it can block anything.
-              </p>
+              <p className="text-sm font-black uppercase tracking-[0.15em]">{PERMISSION_TEXT[permission].title}</p>
+              <p className="mt-2 text-sm font-medium">{PERMISSION_TEXT[permission].body}</p>
             </div>
           </div>
-          <Button variant="primary" className="mt-6 active:border-paper! active:bg-paper! active:text-ink!" onClick={onRequestPermission}>
+          <Button
+            variant="primary"
+            className="mt-6 active:border-paper! active:bg-paper! active:text-ink!"
+            onClick={() => onRequestPermission(permission)}
+          >
             Grant access <ArrowRight strokeWidth={2.5} className="size-5" />
           </Button>
         </section>
-      )}
+      ))}
 
       <section className="px-6 py-6">
         <Button variant={status.enabled ? 'secondary' : 'primary'} onClick={onToggle}>
@@ -77,7 +107,7 @@ export function StatusScreen({
       <section className="swiss-dots border-t-4 border-ink bg-muted">
         <div className="grid grid-cols-2 gap-[2px] bg-ink pb-[2px]">
           <Stat label="Mode" value={MODE_NAMES[status.mode]} />
-          <Stat label="Numbers" value={String(status.numbers.length).padStart(2, '0')} />
+          <Stat label="Direction" value={DIRECTION_NAMES[status.direction]} />
           <Stat label="Today" value={String(log.filter((e) => isToday(e.at)).length).padStart(2, '0')} />
           <Stat label="Total" value={String(log.length).padStart(2, '0')} />
         </div>

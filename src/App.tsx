@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { TabBar, type Tab } from './components/TabBar'
 import { tap } from './lib/haptics'
 import { hasPin } from './lib/pin'
-import { CallGuard, type LogEntry, type Rules, type Status } from './plugins/callguard'
+import { CallGuard, type LogEntry, type Permissions, type Rules, type Status } from './plugins/callguard'
 import { LockScreen } from './screens/LockScreen'
 import { LogScreen } from './screens/LogScreen'
 import { RulesScreen } from './screens/RulesScreen'
@@ -49,10 +49,10 @@ export default function App() {
     setStatus(await CallGuard.setRules(rules))
   }
 
-  const requestPermission = async () => {
+  const requestPermission = async (direction: keyof Permissions) => {
     expectingSystemDialog.current = true
     try {
-      setStatus(await CallGuard.requestPermission())
+      setStatus(await CallGuard.requestPermission({ direction }))
     } finally {
       expectingSystemDialog.current = false
     }
@@ -60,13 +60,25 @@ export default function App() {
 
   if (phase === 'loading') return <div className="h-full bg-paper" />
   if (phase !== 'open') {
-    return <LockScreen key={phase} mode={phase === 'setup' ? 'setup' : 'unlock'} onUnlock={() => {
+    return (
+      <LockScreen
+        key={phase}
+        mode={phase === 'setup' ? 'setup' : 'unlock'}
+        onUnlock={() => {
           setPhase('open')
           refresh()
-        }} />
+        }}
+      />
+    )
   }
 
-  const rules: Rules | null = status && { enabled: status.enabled, mode: status.mode, numbers: status.numbers }
+  const rules: Rules | null = status && {
+    enabled: status.enabled,
+    mode: status.mode,
+    direction: status.direction,
+    blockHidden: status.blockHidden,
+    numbers: status.numbers,
+  }
 
   return (
     <div className="flex h-full flex-col">

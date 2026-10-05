@@ -1,8 +1,10 @@
 # Gently
 
-Android app that blocks outgoing calls, protected by an access code.
+Android app that blocks outgoing and incoming calls, protected by an access code.
 
+- **Direction:** outgoing, incoming, or both
 - **Modes:** block all calls, block a list of numbers, or allow only a list of numbers
+- **Hidden numbers:** optionally reject incoming calls with no caller ID
 - **Access code:** 6 digits, stored as a salted PBKDF2 hash, with an escalating lockout after 5 wrong attempts
 - **Log:** every blocked attempt, with time and number
 - Emergency numbers are never blocked (Android enforces this)
@@ -13,6 +15,7 @@ Android app that blocks outgoing calls, protected by an access code.
 - Design: Swiss International style. All tokens live in `src/index.css`
 - Native: `android/app/src/main/java/com/hmiguel/gently/callguard/`
   - `GentlyRedirectionService` uses Android's `CallRedirectionService` (Android 10+) to cancel matching calls from any dialer
+  - `GentlyScreeningService` uses `CallScreeningService` to reject matching incoming calls before they ring
   - `RuleStore` holds the rules and log in SharedPreferences, so blocking keeps working while the app is closed
   - `CallGuardPlugin` is the bridge to the UI (`src/plugins/callguard.ts`)
 

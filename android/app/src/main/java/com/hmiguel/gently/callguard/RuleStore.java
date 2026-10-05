@@ -20,10 +20,20 @@ public final class RuleStore {
     public static final String MODE_BLOCKLIST = "blocklist";
     public static final String MODE_ALLOWLIST = "allowlist";
 
+    public static final String DIRECTION_OUTGOING = "outgoing";
+    public static final String DIRECTION_INCOMING = "incoming";
+    public static final String DIRECTION_BOTH = "both";
+
+    /** Log entry directions. */
+    public static final String OUT = "out";
+    public static final String IN = "in";
+
     private static final String PREFS = "gently.callguard";
     private static final String KEY_ENABLED = "enabled";
     private static final String KEY_MODE = "mode";
     private static final String KEY_NUMBERS = "numbers";
+    private static final String KEY_DIRECTION = "direction";
+    private static final String KEY_BLOCK_HIDDEN = "blockHidden";
     private static final String KEY_LOG = "log";
     private static final int LOG_LIMIT = 200;
 
@@ -45,17 +55,40 @@ public final class RuleStore {
         return parseArray(prefs.getString(KEY_NUMBERS, "[]"));
     }
 
-    public void save(boolean enabled, String mode, JSONArray numbers) {
+    public String getDirection() {
+        return prefs.getString(KEY_DIRECTION, DIRECTION_OUTGOING);
+    }
+
+    public boolean isBlockHidden() {
+        return prefs.getBoolean(KEY_BLOCK_HIDDEN, false);
+    }
+
+    public void save(boolean enabled, String mode, String direction, boolean blockHidden, JSONArray numbers) {
         prefs.edit()
             .putBoolean(KEY_ENABLED, enabled)
             .putString(KEY_MODE, mode)
+            .putString(KEY_DIRECTION, direction)
+            .putBoolean(KEY_BLOCK_HIDDEN, blockHidden)
             .putString(KEY_NUMBERS, numbers.toString())
             .apply();
     }
 
     /** Decides whether an outgoing call to {@code number} must be cancelled. */
-    public boolean shouldBlock(String number) {
-        if (!isEnabled()) return false;
+    public boolean shouldBlockOutgoing(String number) {
+        return isEnabled() && !DIRECTION_INCOMING.equals(getDirection()) && matches(number);
+    }
+
+    /**
+     * Decides whether an incoming call from {@code number} must be rejected.
+     * A null/empty number is a hidden caller, governed only by blockHidden.
+     */
+    public boolean shouldBlockIncoming(String number) {
+        if (!isEnabled() || DIRECTION_OUTGOING.equals(getDirection())) return false;
+        if (number == null || digits(number).isEmpty()) return isBlockHidden();
+        return matches(number);
+    }
+
+    private boolean matches(String number) {
         String mode = getMode();
         if (MODE_ALL.equals(mode)) return true;
 
@@ -95,11 +128,11 @@ public final class RuleStore {
         return parseArray(prefs.getString(KEY_LOG, "[]"));
     }
 
-    public synchronized void appendLog(String number) {
+    public synchronized void appendLog(String number, String direction) {
         JSONArray log = getLog();
         List<JSONObject> entries = new ArrayList<>();
         try {
-            entries.add(new JSONObject().put("number", number).put("at", System.currentTimeMillis()));
+            entries.add(new JSONObject().put("number", number == null ? "" : number).put("direction", direction).put("at", System.currentTimeMillis()));
         } catch (JSONException ignored) {
             return;
         }

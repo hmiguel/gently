@@ -1,3 +1,4 @@
+import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'
 import { useState } from 'react'
 import { Button, ScreenHeader } from '../components/ui'
 import type { LogEntry, NumberEntry } from '../plugins/callguard'
@@ -21,6 +22,7 @@ export function LogScreen({
 
   const labelFor = (n: string) => {
     const d = digitsOf(n)
+    if (!d) return undefined
     return numbers.find((e) => d.length >= 7 && (digitsOf(e.number).endsWith(d) || d.endsWith(digitsOf(e.number))))
       ?.label
   }
@@ -48,6 +50,8 @@ export function LogScreen({
           <ol>
             {log.map((entry) => {
               const label = labelFor(entry.number)
+              const incoming = entry.direction === 'in'
+              const Arrow = incoming ? ArrowDownLeft : ArrowUpRight
               return (
                 <li
                   key={`${entry.at}-${entry.number}`}
@@ -56,7 +60,14 @@ export function LogScreen({
                   <span className="text-lg font-black">{time.format(entry.at)}</span>
                   <span className="text-label text-ink/60">{day.format(entry.at)}</span>
                   <span className="min-w-0">
-                    <span className="block truncate font-bold">{entry.number}</span>
+                    <span className="flex items-center gap-2 font-bold">
+                      <Arrow
+                        strokeWidth={3}
+                        className={`size-4 shrink-0 ${incoming ? 'text-accent-ink' : ''}`}
+                        aria-label={incoming ? 'Incoming' : 'Outgoing'}
+                      />
+                      <span className="truncate">{entry.number || 'Hidden number'}</span>
+                    </span>
                     {label && <span className="text-label block truncate text-accent-ink">{label}</span>}
                   </span>
                 </li>

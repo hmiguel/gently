@@ -5,6 +5,18 @@ import { labelFor } from '../lib/rules'
 import type { LogEntry, Rule } from '../plugins/callguard'
 
 const time = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' })
+
+/** "03:32" stays big; a 12-hour locale's "PM" becomes a small label so the column never wraps. */
+function formatTime(ts: number) {
+  const parts = time.formatToParts(ts)
+  const period = parts.find((p) => p.type === 'dayPeriod')?.value
+  const clock = parts
+    .filter((p) => p.type !== 'dayPeriod')
+    .map((p) => p.value)
+    .join('')
+    .trim()
+  return { clock, period }
+}
 const day = new Intl.DateTimeFormat(undefined, { day: '2-digit', month: 'short' })
 
 /** Blocked attempts, laid out like a departures board. */
@@ -34,23 +46,28 @@ export function LogScreen({
         </section>
       ) : (
         <>
-          <div className="text-label grid grid-cols-[4.5rem_4.5rem_1fr] border-y-4 border-ink bg-muted px-6 py-3">
-            <span>Time</span>
-            <span>Date</span>
+          <div className="text-label grid grid-cols-[5.5rem_1fr] border-y-4 border-ink bg-muted px-6 py-3">
+            <span>When</span>
             <span>Number</span>
           </div>
           <ol>
             {log.map((entry) => {
               const label = labelFor(rules, entry.number)
+              const { clock, period } = formatTime(entry.at)
               const incoming = entry.direction === 'in'
               const Arrow = incoming ? ArrowDownLeft : ArrowUpRight
               return (
                 <li
                   key={`${entry.at}-${entry.number}`}
-                  className="grid grid-cols-[4.5rem_4.5rem_1fr] items-baseline border-b-2 border-ink px-6 py-3 tabular-nums"
+                  className="grid grid-cols-[5.5rem_1fr] items-baseline border-b-2 border-ink px-6 py-3 tabular-nums"
                 >
-                  <span className="text-lg font-black">{time.format(entry.at)}</span>
-                  <span className="text-label text-ink/60">{day.format(entry.at)}</span>
+                  <span>
+                    <span className="block text-lg font-black">
+                      {clock}
+                      {period && <span className="text-label ml-0.5 align-top">{period}</span>}
+                    </span>
+                    <span className="text-label block text-ink/60">{day.format(entry.at)}</span>
+                  </span>
                   <span className="min-w-0">
                     <span className="flex items-center gap-2 font-bold">
                       <Arrow

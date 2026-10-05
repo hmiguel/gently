@@ -31,7 +31,7 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     CapApp.getInfo()
       .then((info) => setVersion(`${info.version} (${info.build})`))
-      .catch(() => setVersion('Development'))
+      .catch(() => setVersion(__APP_VERSION__))
   }, [])
 
   return (
@@ -49,7 +49,7 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
         {/* The mark, as in the launcher icon. */}
         <div aria-hidden className="pointer-events-none absolute -right-10 top-0 size-28 rounded-full bg-accent" />
         <div aria-hidden className="pointer-events-none absolute right-8 top-16 h-3 w-24 bg-ink" />
-        <p className="relative max-w-[22ch] text-lg font-medium leading-snug">
+        <p className="relative max-w-[62%] text-lg font-medium leading-snug">
           Blocks the calls you choose, outgoing, incoming or both, behind an access code.
         </p>
       </div>

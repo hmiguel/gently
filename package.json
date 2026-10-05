@@ -1,14 +1,16 @@
 {
   "name": "gently",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "assets": "node scripts/render-assets.mjs"
+    "assets": "node scripts/render-assets.mjs",
+    "release": "npm run build && cap sync android && cd android && ./gradlew bundleRelease assembleRelease",
+    "screenshots": "node scripts/render-screenshots.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.2",

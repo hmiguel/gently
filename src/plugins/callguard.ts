@@ -7,12 +7,12 @@ import { registerPlugin, WebPlugin } from '@capacitor/core'
  */
 export type Direction = 'outgoing' | 'incoming' | 'both'
 export type Action = 'block' | 'allow'
-/** One number, everyone, or incoming calls without caller ID. */
-export type Target = 'number' | 'anyone' | 'hidden'
+/** One number, everyone, numbers outside the SIM's country, or incoming calls without caller ID. */
+export type Target = 'number' | 'anyone' | 'international' | 'hidden'
 
 /**
  * One rule. For a given call the most specific matching rule wins (number or
- * hidden beats anyone); on a tie, block wins. Mirrors RuleStore.java.
+ * hidden, then international, then anyone); on a tie, block wins. Mirrors RuleStore.java.
  */
 export interface Rule {
   id: string
@@ -38,6 +38,8 @@ export interface Permissions {
 
 export interface Status extends Rules {
   permissions: Permissions
+  /** ISO country of the SIM, which defines what "international" means. */
+  homeCountry: string
 }
 
 export interface LogEntry {
@@ -86,6 +88,7 @@ class CallGuardWeb extends WebPlugin implements CallGuardPlugin {
   private defaults(): Status & { log: LogEntry[] } {
     return {
       permissions: { outgoing: false, incoming: false },
+      homeCountry: 'PT',
       enabled: false,
       rules: [],
       log: [],

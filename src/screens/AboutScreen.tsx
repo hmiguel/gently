@@ -57,10 +57,12 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
       <FormSection index="0.1" label="How it works">
         <ol>
           <Point index="01" title="Rules">
-            Each rule blocks or allows calls to a number, to anyone, or from hidden numbers.
+            Each rule blocks or allows calls to a number, to anyone, to international numbers, or from
+            hidden numbers.
           </Point>
           <Point index="02" title="Specific wins">
-            A rule for one number beats a rule for anyone. Block everyone and allow a few to keep only those.
+            A rule for one number beats an international rule, which beats a rule for anyone. Block everyone
+            and allow a few to keep only those.
           </Point>
           <Point index="03" title="Access code">
             Changing anything needs your code. The app locks every time it leaves the screen.

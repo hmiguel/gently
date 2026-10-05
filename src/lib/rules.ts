@@ -17,6 +17,7 @@ export const newRuleId = () => crypto.randomUUID()
 /** Who the rule applies to, as a short name. */
 export function ruleSubject(rule: Pick<Rule, 'target' | 'number' | 'label'>) {
   if (rule.target === 'anyone') return 'Anyone'
+  if (rule.target === 'international') return 'International'
   if (rule.target === 'hidden') return 'Hidden numbers'
   return rule.label || rule.number || 'A number'
 }
@@ -27,6 +28,10 @@ export function describeRule(rule: Pick<Rule, 'action' | 'direction' | 'target' 
   if (rule.target === 'anyone') {
     if (rule.direction === 'both') return `${verb} all calls.`
     return `${verb} all ${rule.direction} calls.`
+  }
+  if (rule.target === 'international') {
+    if (rule.direction === 'both') return `${verb} all international calls.`
+    return `${verb} all international ${rule.direction} calls.`
   }
   if (rule.target === 'hidden') return `${verb} calls from hidden numbers.`
   const who = ruleSubject(rule)
@@ -52,8 +57,20 @@ export const DIRECTION_OPTIONS: { value: Direction; title: string; description: 
   { value: 'both', title: 'Both', description: 'Calls in either direction' },
 ]
 
-export const TARGET_OPTIONS: { value: Target; title: string; description: string }[] = [
-  { value: 'number', title: 'A number', description: 'From your contacts or typed in' },
-  { value: 'anyone', title: 'Anyone', description: 'Every number' },
-  { value: 'hidden', title: 'Hidden numbers', description: 'Incoming calls with no caller ID' },
-]
+/** Country name for an ISO code in the viewer's language, e.g. "PT" -> "Portugal". */
+export function countryName(iso: string) {
+  try {
+    return (iso && new Intl.DisplayNames(undefined, { type: 'region' }).of(iso)) || 'your country'
+  } catch {
+    return 'your country'
+  }
+}
+
+export function targetOptions(homeCountry: string): { value: Target; title: string; description: string }[] {
+  return [
+    { value: 'number', title: 'A number', description: 'From your contacts or typed in' },
+    { value: 'anyone', title: 'Anyone', description: 'Every number' },
+    { value: 'international', title: 'International', description: `Numbers outside ${countryName(homeCountry)}` },
+    { value: 'hidden', title: 'Hidden numbers', description: 'Incoming calls with no caller ID' },
+  ]
+}

@@ -92,6 +92,7 @@ public class CallGuardPlugin extends Plugin {
 
         JSObject ret = new JSObject();
         ret.put("permissions", permissions);
+        ret.put("homeCountry", International.homeCountry(getContext()));
         ret.put("enabled", store.isEnabled());
         ret.put("rules", toJSArray(store.getRules()));
         call.resolve(ret);

@@ -3,8 +3,9 @@
 Android app that blocks outgoing and incoming calls, protected by an access code.
 
 - **Rules:** each rule says *block* or *allow*, *outgoing / incoming / both*, and *who*: one number
-  (picked from contacts or typed), anyone, or hidden callers. A rule for a specific number wins over a
-  rule for anyone, so "block all outgoing" + "allow Mom" works as an allowlist
+  (picked from contacts or typed), anyone, international numbers (outside the SIM's country), or hidden
+  callers. The most specific rule wins (number/hidden, then international, then anyone), so "block all
+  outgoing" + "allow Mom" works as an allowlist
 - **Access code:** 6 digits, stored as a salted PBKDF2 hash, with an escalating lockout after 5 wrong attempts.
   The app locks whenever it leaves the screen; the code can be changed in Settings (current code required)
 - **Log:** every blocked attempt, with time, number and direction
@@ -55,6 +56,15 @@ cd android && ./gradlew assembleDebug    # or: npx cap run android
 On first launch: set the access code, create a rule, then use **Grant access** on the Status screen:
 choose Gently as the call redirection app (outgoing) and/or the caller ID & spam app, then allow Contacts
 (incoming).
+
+Debug builds install as **Gently Dev** (`com.hmiguel.gently.dev`) next to the release app.
+
+Device tests (rule precedence, international detection; they place no calls, and the international
+cases only run with a Portuguese SIM):
+
+```sh
+cd android && ./gradlew :app:connectedDebugAndroidTest
+```
 
 Install on a phone without a cable via Wireless debugging (Android 11+):
 

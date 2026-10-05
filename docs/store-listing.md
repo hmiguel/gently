@@ -25,11 +25,11 @@ SIMPLE RULES
 Each rule reads like a sentence: "Block calls to Alex." "Block all outgoing calls." "Allow calls from Mom."
 • Block or allow
 • Outgoing, incoming, or both
-• One number, anyone, or hidden numbers
+• One number, anyone, international numbers, or hidden numbers
 Pick numbers straight from your contacts or type them in.
 
 SPECIFIC WINS
-A rule for one number beats a rule for anyone. Block all outgoing calls and allow just a few people, and only those calls go through.
+A rule for one number beats a rule for anyone. Block all outgoing calls and allow just a few people, and only those calls go through. Block international calls and still allow the one relative abroad.
 
 PROTECTED BY A CODE
 Changing anything needs your 6-digit access code. Gently locks itself every time you leave the app, and repeated wrong attempts trigger a growing lockout.

@@ -9,7 +9,7 @@ import {
   DIRECTION_OPTIONS,
   newRuleId,
   sameNumber,
-  TARGET_OPTIONS,
+  targetOptions,
 } from '../lib/rules'
 import type { Rule } from '../plugins/callguard'
 import type { PickedContact } from '../plugins/contacts'
@@ -25,6 +25,7 @@ const BLANK: Omit<Rule, 'id'> = { action: 'block', direction: 'outgoing', target
  */
 export function RuleForm({
   rule,
+  homeCountry,
   others,
   onSave,
   onDelete,
@@ -32,6 +33,8 @@ export function RuleForm({
   onClose,
 }: {
   rule?: Rule
+  /** SIM country, to explain what "international" covers. */
+  homeCountry: string
   /** Every other rule, for duplicate checks. */
   others: Rule[]
   onSave: (rule: Rule) => void
@@ -126,7 +129,7 @@ export function RuleForm({
         )}
       </FormSection>
       <FormSection index="2.3" label="Who">
-        <OptionList label="Who" options={TARGET_OPTIONS} value={draft.target} onChange={(target) => update({ target })} />
+        <OptionList label="Who" options={targetOptions(homeCountry)} value={draft.target} onChange={(target) => update({ target })} />
         {draft.target === 'number' && (
           <div className="swiss-diagonal space-y-6 border-t-2 border-ink bg-muted px-6 py-6">
             <Button variant="secondary" onClick={pick}>

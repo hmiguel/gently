@@ -20,10 +20,11 @@ import java.util.UUID;
  * <ul>
  *   <li>action: "block" | "allow"</li>
  *   <li>direction: "outgoing" | "incoming" | "both"</li>
- *   <li>target: "number" (one number) | "anyone" | "hidden" (incoming, no caller ID)</li>
+ *   <li>target: "number" (one number) | "anyone" | "international" (outside the SIM's
+ *       country) | "hidden" (incoming, no caller ID)</li>
  * </ul>
- * For a given call, the most specific matching rule wins (a number or hidden
- * rule beats an "anyone" rule); on a tie, block wins.
+ * For a given call, the most specific matching rule wins: number or hidden, then
+ * international, then anyone. On a tie, block wins.
  */
 public final class RuleStore {
     public static final String OUTGOING = "outgoing";
@@ -36,6 +37,7 @@ public final class RuleStore {
     public static final String TARGET_NUMBER = "number";
     public static final String TARGET_ANYONE = "anyone";
     public static final String TARGET_HIDDEN = "hidden";
+    public static final String TARGET_INTERNATIONAL = "international";
 
     /** Log entry directions. */
     public static final String OUT = "out";
@@ -47,10 +49,12 @@ public final class RuleStore {
     private static final String KEY_LOG = "log";
     private static final int LOG_LIMIT = 200;
 
+    private final Context context;
     private final SharedPreferences prefs;
 
     public RuleStore(Context context) {
-        prefs = context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        this.context = context.getApplicationContext();
+        prefs = this.context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         migrateLegacy();
     }
 
@@ -91,6 +95,8 @@ public final class RuleStore {
     private boolean shouldBlock(String direction, String number) {
         if (!isEnabled()) return false;
         boolean hidden = number == null || digits(number).isEmpty();
+        // Only worked out if an international rule applies to this direction.
+        Boolean international = null;
 
         int bestRank = -1;
         boolean block = false;
@@ -99,7 +105,10 @@ public final class RuleStore {
             JSONObject rule = rules.optJSONObject(i);
             if (rule == null || !covers(rule.optString("direction"), direction)) continue;
 
-            int rank = matchRank(rule, number, hidden);
+            if (international == null && TARGET_INTERNATIONAL.equals(rule.optString("target"))) {
+                international = !hidden && International.isInternational(context, number);
+            }
+            int rank = matchRank(rule, number, hidden, Boolean.TRUE.equals(international));
             if (rank < 0) continue;
             boolean ruleBlocks = !ALLOW.equals(rule.optString("action"));
             if (rank > bestRank) {
@@ -112,15 +121,17 @@ public final class RuleStore {
         return block;
     }
 
-    /** -1 = no match, 0 = matched by "anyone", 1 = matched specifically. */
-    private static int matchRank(JSONObject rule, String number, boolean hidden) {
+    /** -1 = no match; otherwise how specific the match is: anyone 0, international 1, number/hidden 2. */
+    private static int matchRank(JSONObject rule, String number, boolean hidden, boolean international) {
         switch (rule.optString("target")) {
             case TARGET_ANYONE:
                 return 0;
+            case TARGET_INTERNATIONAL:
+                return international ? 1 : -1;
             case TARGET_HIDDEN:
-                return hidden ? 1 : -1;
+                return hidden ? 2 : -1;
             case TARGET_NUMBER:
-                return !hidden && sameNumber(number, rule.optString("number")) ? 1 : -1;
+                return !hidden && sameNumber(number, rule.optString("number")) ? 2 : -1;
             default:
                 return -1;
         }

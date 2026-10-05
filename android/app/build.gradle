@@ -36,7 +36,15 @@ android {
         }
     }
     buildTypes {
+        debug {
+            // Installs next to the Play/release build instead of clashing with its signature.
+            applicationIdSuffix ".dev"
+            resValue "string", "app_name", "Gently Dev"
+            resValue "string", "title_activity_main", "Gently Dev"
+        }
         release {
+            resValue "string", "app_name", "Gently"
+            resValue "string", "title_activity_main", "Gently"
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

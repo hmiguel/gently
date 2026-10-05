@@ -211,6 +211,7 @@ export default function App() {
         <RuleForm
           key={overlay.id ?? 'new'}
           rule={rules.rules.find((r) => r.id === overlay.id)}
+          homeCountry={status?.homeCountry ?? ''}
           others={rules.rules.filter((r) => r.id !== overlay.id)}
           onPickContact={pickContact}
           onClose={() => setOverlay(null)}

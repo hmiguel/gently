@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Gently</string>
+    <string name="title_activity_main">Gently</string>
+    <string name="package_name">com.hmiguel.gently</string>
+    <string name="custom_url_scheme">com.hmiguel.gently</string>
+</resources>

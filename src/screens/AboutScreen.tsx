@@ -1,8 +1,6 @@
 import { App as CapApp } from '@capacitor/app'
 import { useEffect, useState, type ReactNode } from 'react'
-import { KeyRound } from 'lucide-react'
 import { FormScreen, FormSection } from '../components/FormScreen'
-import { Button } from '../components/ui'
 
 /** Numbered row: red index, bold title, plain explanation. */
 function Point({ index, title, children }: { index: string; title: string; children: ReactNode }) {
@@ -27,16 +25,7 @@ function Fact({ label, value }: { label: string; value: ReactNode }) {
   )
 }
 
-export function AboutScreen({
-  notice,
-  onChangeCode,
-  onClose,
-}: {
-  /** One-off confirmation, e.g. after the code was changed. */
-  notice?: string
-  onChangeCode: () => void
-  onClose: () => void
-}) {
+export function AboutScreen({ onClose }: { onClose: () => void }) {
   const [version, setVersion] = useState('—')
 
   useEffect(() => {
@@ -111,20 +100,7 @@ export function AboutScreen({
         </p>
       </section>
 
-      <FormSection index="0.4" label="Access code">
-        <div className="px-6 py-6">
-          {notice && (
-            <p className="text-label mb-4 text-accent-ink" role="status">
-              {notice}
-            </p>
-          )}
-          <Button variant="secondary" onClick={onChangeCode}>
-            Change access code <KeyRound strokeWidth={2.5} className="size-5" />
-          </Button>
-        </div>
-      </FormSection>
-
-      <FormSection index="0.5" label="Details">
+      <FormSection index="0.4" label="Details">
         <Fact label="Version" value={version} />
         <Fact label="Requires" value="Android 10+" />
       </FormSection>

@@ -1,5 +1,5 @@
 import { App as CapApp } from '@capacitor/app'
-import { Info, Lock } from 'lucide-react'
+import { Info, Lock, Settings } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { TabBar, type Tab } from './components/TabBar'
 import { tap } from './lib/haptics'
@@ -10,13 +10,18 @@ import { LockScreen } from './screens/LockScreen'
 import { LogScreen } from './screens/LogScreen'
 import { AboutScreen } from './screens/AboutScreen'
 import { RuleForm } from './screens/RuleForm'
+import { SettingsScreen } from './screens/SettingsScreen'
 import { RulesScreen } from './screens/RulesScreen'
 import { StatusScreen } from './screens/StatusScreen'
 
 type Phase = 'loading' | 'setup' | 'locked' | 'open'
 
 /** Full-screen pages layered over the tabs. A rule with `id: null` is a new one. */
-type Overlay = { kind: 'rule'; id: string | null } | { kind: 'about'; notice?: string } | { kind: 'changeCode' }
+type Overlay =
+  | { kind: 'rule'; id: string | null }
+  | { kind: 'settings'; notice?: string }
+  | { kind: 'changeCode' }
+  | { kind: 'about' }
 
 export default function App() {
   const [phase, setPhase] = useState<Phase>('loading')
@@ -113,6 +118,17 @@ export default function App() {
           <div className="flex">
             <button
               type="button"
+              aria-label="Settings"
+              onClick={() => {
+                tap()
+                setOverlay({ kind: 'settings' })
+              }}
+              className="flex size-11 items-center justify-center transition-colors duration-150 ease-linear active:bg-ink active:text-paper"
+            >
+              <Settings strokeWidth={2.5} className="size-5" />
+            </button>
+            <button
+              type="button"
               aria-label="About Gently"
               onClick={() => {
                 tap()
@@ -172,19 +188,22 @@ export default function App() {
 
       <TabBar active={tab} onChange={setTab} />
 
-      {overlay?.kind === 'about' && (
-        <AboutScreen
+      {status && overlay?.kind === 'settings' && (
+        <SettingsScreen
+          permissions={status.permissions}
           notice={overlay.notice}
           onChangeCode={() => setOverlay({ kind: 'changeCode' })}
+          onRequestPermission={requestPermission}
           onClose={() => setOverlay(null)}
         />
       )}
+      {overlay?.kind === 'about' && <AboutScreen onClose={() => setOverlay(null)} />}
       {overlay?.kind === 'changeCode' && (
         <div className="fixed inset-0 z-40 animate-sheet-in bg-paper">
           <LockScreen
             mode="change"
-            onCancel={() => setOverlay({ kind: 'about' })}
-            onUnlock={() => setOverlay({ kind: 'about', notice: 'Access code changed' })}
+            onCancel={() => setOverlay({ kind: 'settings' })}
+            onUnlock={() => setOverlay({ kind: 'settings', notice: 'Access code changed' })}
           />
         </div>
       )}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Themed-icon variant (Android 13+). Master: resources/icon-monochrome.svg -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="5"
+        android:pathData="M37.5,54a21.5,21.5 0,1 0,43 0a21.5,21.5 0,1 0,-43 0z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M26,60.5h44v8h-44z" />
+</vector>

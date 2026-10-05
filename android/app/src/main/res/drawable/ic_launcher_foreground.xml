@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gently mark: red signal circle crossed by a black bar. Master: resources/icon.svg -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FF3000"
+        android:pathData="M35,54a24,24 0,1 0,48 0a24,24 0,1 0,-48 0z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M26,60.5h44v8h-44z" />
+</vector>

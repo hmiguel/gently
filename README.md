@@ -38,3 +38,13 @@ cd android && ./gradlew assembleDebug    # or: npx cap run android
 ```
 
 On first launch: set the access code, tap **Grant access**, and choose Gently as the call redirection app.
+
+## Icons & store assets
+
+- Master artwork: `resources/icon.svg` (and `icon-monochrome.svg` for themed icons), on the 108×108
+  adaptive-icon grid using the app's palette
+- The launcher icon is a vector: `android/app/src/main/res/drawable/ic_launcher_foreground.xml`.
+  Keep it in sync with the SVG if the mark changes
+- `npm run assets` renders the legacy launcher PNGs and the Play Store files in `resources/store/`
+  (`icon-512.png`, `feature-graphic.png`) using your installed Chrome
+

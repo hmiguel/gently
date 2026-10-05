@@ -1,0 +1,5 @@
+<!-- Single-color variant for Android themed icons: the filled circle becomes a ring. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108">
+  <circle cx="59" cy="54" r="21.5" fill="none" stroke="#000000" stroke-width="5"/>
+  <rect x="26" y="60.5" width="44" height="8" fill="#000000"/>
+</svg>

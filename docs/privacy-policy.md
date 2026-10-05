@@ -1,5 +1,7 @@
 # Gently: Privacy Policy
 
+<!-- Published at https://gist.github.com/hmiguel/71b7c9a76dec40cfcf0e282566d070cc — update the gist when this changes (gh gist edit 71b7c9a76dec40cfcf0e282566d070cc). -->
+
 _Last updated: 5 October 2026_
 
 Gently is a call blocker for Android. This policy explains what the app does with your information.

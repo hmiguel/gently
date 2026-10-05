@@ -3,19 +3,23 @@ package com.hmiguel.gently.callguard;
 import android.Manifest;
 import android.app.role.RoleManager;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.provider.Settings;
+import android.util.Log;
 
 import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
 
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
-import com.getcapacitor.PermissionState;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
-import com.getcapacitor.annotation.Permission;
-import com.getcapacitor.annotation.PermissionCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,13 +30,25 @@ import org.json.JSONException;
  * <p>Incoming blocking needs two grants: the call-screening role, and READ_CONTACTS.
  * Android does not pass calls from saved contacts to a screening app that can't
  * read contacts, so without it a rule for a contact would silently never fire.
+ *
+ * <p>Contacts is checked and requested with the plain Android APIs, not Capacitor's
+ * annotation-based permission aliases: those are read by reflection and broke under
+ * R8 in release builds (the request never returned).
  */
-@CapacitorPlugin(
-    name = "CallGuard",
-    permissions = @Permission(alias = CallGuardPlugin.CONTACTS, strings = {Manifest.permission.READ_CONTACTS})
-)
+@CapacitorPlugin(name = "CallGuard")
 public class CallGuardPlugin extends Plugin {
-    static final String CONTACTS = "contacts";
+    private static final String TAG = "Gently";
+
+    private ActivityResultLauncher<String> contactsLauncher;
+    /** The requestPermission call waiting on the contacts prompt. */
+    private PluginCall pendingContactsCall;
+
+    @Override
+    public void load() {
+        // Must be registered while the activity is being created, which is when plugins load.
+        contactsLauncher = getActivity().registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), granted -> onContactsResult());
+    }
 
     private RuleStore store() {
         return new RuleStore(getContext());
@@ -51,7 +67,8 @@ public class CallGuardPlugin extends Plugin {
     }
 
     private boolean hasContacts() {
-        return getPermissionState(CONTACTS) == PermissionState.GRANTED;
+        return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CONTACTS)
+            == PackageManager.PERMISSION_GRANTED;
     }
 
     private boolean hasIncoming() {
@@ -96,6 +113,8 @@ public class CallGuardPlugin extends Plugin {
     @PluginMethod
     public void requestPermission(PluginCall call) {
         String role = roleFor(call.getString("direction", RuleStore.OUTGOING));
+        Log.i(TAG, "requestPermission " + call.getString("direction") + " roleHeld=" + hasRole(role)
+            + " contacts=" + hasContacts());
         if (hasRole(role)) {
             continueWithContacts(call);
             return;
@@ -112,22 +131,44 @@ public class CallGuardPlugin extends Plugin {
     @ActivityCallback
     private void onRoleResult(PluginCall call, ActivityResult result) {
         if (call == null) return;
+        Log.i(TAG, "role result=" + result.getResultCode());
         if (hasRole(roleFor(call.getString("direction", RuleStore.OUTGOING)))) continueWithContacts(call);
         else getStatus(call);
     }
 
     /** Second step for incoming: the contacts permission. */
     private void continueWithContacts(PluginCall call) {
-        if (RuleStore.INCOMING.equals(call.getString("direction")) && !hasContacts()) {
-            requestPermissionForAlias(CONTACTS, call, "onContactsResult");
-        } else {
+        if (!RuleStore.INCOMING.equals(call.getString("direction")) || hasContacts()) {
             getStatus(call);
+            return;
         }
+        pendingContactsCall = call;
+        contactsLauncher.launch(Manifest.permission.READ_CONTACTS);
     }
 
-    @PermissionCallback
-    private void onContactsResult(PluginCall call) {
-        getStatus(call);
+    /**
+     * If the prompt was refused, or never shown (Android and Xiaomi's permission manager stop
+     * asking after a denial), the app's own permission screen is the only way left.
+     */
+    private void onContactsResult() {
+        PluginCall call = pendingContactsCall;
+        pendingContactsCall = null;
+        if (call == null) return;
+        Log.i(TAG, "contacts result granted=" + hasContacts());
+        if (hasContacts()) getStatus(call);
+        else openAppSettings(call);
+    }
+
+    private void openAppSettings(PluginCall call) {
+        Log.i(TAG, "opening app settings for contacts");
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.fromParts("package", getContext().getPackageName(), null));
+        startActivityForResult(call, intent, "onSettingsResult");
+    }
+
+    @ActivityCallback
+    private void onSettingsResult(PluginCall call, ActivityResult result) {
+        if (call != null) getStatus(call);
     }
 
     @PluginMethod

@@ -12,7 +12,7 @@ const PERMISSION_TEXT: Record<keyof Permissions, { title: string; body: string }
   },
   incoming: {
     title: 'Incoming: access required',
-    body: 'Choose Gently as the caller ID & spam app, then allow Contacts. Android only lets Gently screen calls from your saved contacts with that permission.',
+    body: 'Choose Gently as the caller ID & spam app, then allow Contacts (Android only lets Gently screen calls from saved contacts with it). If no prompt appears, Gently opens its settings: turn on Contacts under Permissions.',
   },
 }
 

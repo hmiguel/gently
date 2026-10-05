@@ -56,4 +56,6 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Android only lets a call-screening app see calls from saved contacts if it can read contacts. -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 </manifest>

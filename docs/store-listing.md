@@ -55,7 +55,7 @@ Requires Android 10 or newer. Gently uses Android's official call redirection an
 
 ## Contact details
 
-- **Email:** [CONTACT EMAIL] (required, shown publicly)
+- **Email:** hugo@lixo.dev (required, shown publicly)
 - **Website:** optional
 - **Privacy policy URL:** [URL where docs/privacy-policy.md is published]
 

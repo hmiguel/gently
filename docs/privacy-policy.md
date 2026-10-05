@@ -43,4 +43,4 @@ If this policy changes, the new version will be published at this same address w
 
 ## Contact
 
-Questions about this policy: **[CONTACT EMAIL]**
+Questions about this policy: **hugo@lixo.dev**

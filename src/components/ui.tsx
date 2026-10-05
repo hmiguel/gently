@@ -12,6 +12,7 @@ const variants: Record<Variant, string> = {
 /** Full-width rectangular button. Press = instant color snap, never a fade. */
 export function Button({
   variant = 'primary',
+  type = 'button',
   className = '',
   onClick,
   ...props
@@ -19,6 +20,7 @@ export function Button({
   return (
     <button
       {...props}
+      type={type}
       onClick={(e) => {
         tap()
         onClick?.(e)

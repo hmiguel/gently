@@ -1,31 +1,23 @@
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'
 import { useState } from 'react'
 import { Button, ScreenHeader } from '../components/ui'
-import type { LogEntry, NumberEntry } from '../plugins/callguard'
+import { labelFor } from '../lib/rules'
+import type { LogEntry, Rule } from '../plugins/callguard'
 
 const time = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' })
 const day = new Intl.DateTimeFormat(undefined, { day: '2-digit', month: 'short' })
 
-const digitsOf = (n: string) => n.replace(/\D/g, '')
-
 /** Blocked attempts, laid out like a departures board. */
 export function LogScreen({
   log,
-  numbers,
+  rules,
   onClear,
 }: {
   log: LogEntry[]
-  numbers: NumberEntry[]
+  rules: Rule[]
   onClear: () => void
 }) {
   const [confirming, setConfirming] = useState(false)
-
-  const labelFor = (n: string) => {
-    const d = digitsOf(n)
-    if (!d) return undefined
-    return numbers.find((e) => d.length >= 7 && (digitsOf(e.number).endsWith(d) || d.endsWith(digitsOf(e.number))))
-      ?.label
-  }
 
   return (
     <>
@@ -49,7 +41,7 @@ export function LogScreen({
           </div>
           <ol>
             {log.map((entry) => {
-              const label = labelFor(entry.number)
+              const label = labelFor(rules, entry.number)
               const incoming = entry.direction === 'in'
               const Arrow = incoming ? ArrowDownLeft : ArrowUpRight
               return (

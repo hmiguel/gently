@@ -1,25 +1,9 @@
 import { ArrowRight, ShieldAlert } from 'lucide-react'
+import { useState } from 'react'
 import { Button, ScreenHeader, Stat } from '../components/ui'
-import {
-  requiredPermissions,
-  type Direction,
-  type LogEntry,
-  type Mode,
-  type Permissions,
-  type Status,
-} from '../plugins/callguard'
+import { requiredPermissions, type LogEntry, type Permissions, type Status } from '../plugins/callguard'
 
-const MODE_NAMES: Record<Mode, string> = {
-  all: 'All',
-  blocklist: 'Block',
-  allowlist: 'Allow',
-}
-
-const DIRECTION_NAMES: Record<Direction, string> = {
-  outgoing: 'Out',
-  incoming: 'In',
-  both: 'Both',
-}
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000
 
 const PERMISSION_TEXT: Record<keyof Permissions, { title: string; body: string }> = {
   outgoing: {
@@ -41,14 +25,17 @@ export function StatusScreen({
   log,
   onToggle,
   onRequestPermission,
+  onAddRule,
 }: {
   status: Status
   log: LogEntry[]
   onToggle: () => void
   onRequestPermission: (direction: keyof Permissions) => void
+  onAddRule: () => void
 }) {
-  const missing = requiredPermissions(status.direction).filter((p) => !status.permissions[p])
-  const active = status.enabled && missing.length === 0
+  const [now] = useState(Date.now)
+  const missing = requiredPermissions(status.rules).filter((p) => !status.permissions[p])
+  const active = status.enabled && status.rules.length > 0 && missing.length === 0
 
   return (
     <>
@@ -98,17 +85,26 @@ export function StatusScreen({
       ))}
 
       <section className="px-6 py-6">
-        <Button variant={status.enabled ? 'secondary' : 'primary'} onClick={onToggle}>
-          {status.enabled ? 'Turn blocking off' : 'Turn blocking on'}
-          <span className={`size-4 ${status.enabled ? 'bg-accent' : 'border-2 border-current'}`} aria-hidden />
-        </Button>
+        {status.rules.length === 0 ? (
+          <>
+            <p className="mb-4 text-sm font-medium text-ink/70">Nothing to block yet. Start with your first rule.</p>
+            <Button onClick={onAddRule}>
+              Create a rule <ArrowRight strokeWidth={2.5} className="size-5" />
+            </Button>
+          </>
+        ) : (
+          <Button variant={status.enabled ? 'secondary' : 'primary'} onClick={onToggle}>
+            {status.enabled ? 'Turn blocking off' : 'Turn blocking on'}
+            <span className={`size-4 ${status.enabled ? 'bg-accent' : 'border-2 border-current'}`} aria-hidden />
+          </Button>
+        )}
       </section>
 
       <section className="swiss-dots border-t-4 border-ink bg-muted">
         <div className="grid grid-cols-2 gap-[2px] bg-ink pb-[2px]">
-          <Stat label="Mode" value={MODE_NAMES[status.mode]} />
-          <Stat label="Direction" value={DIRECTION_NAMES[status.direction]} />
+          <Stat label="Rules" value={String(status.rules.length).padStart(2, '0')} />
           <Stat label="Today" value={String(log.filter((e) => isToday(e.at)).length).padStart(2, '0')} />
+          <Stat label="7 days" value={String(log.filter((e) => now - e.at < WEEK_MS).length).padStart(2, '0')} />
           <Stat label="Total" value={String(log.length).padStart(2, '0')} />
         </div>
         <p className="px-6 py-6 text-sm font-medium text-ink/70">

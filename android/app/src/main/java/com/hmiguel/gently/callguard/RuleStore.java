@@ -9,20 +9,33 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Blocking rules and the blocked-call log, shared between the UI plugin and the
- * redirection service. Lives in native SharedPreferences so the service can read
- * it while the app (and its WebView) is closed.
+ * call services. Lives in native SharedPreferences so the services can read it
+ * while the app (and its WebView) is closed.
+ *
+ * <p>A rule is {@code {id, action, direction, target, number?, label?}}:
+ * <ul>
+ *   <li>action: "block" | "allow"</li>
+ *   <li>direction: "outgoing" | "incoming" | "both"</li>
+ *   <li>target: "number" (one number) | "anyone" | "hidden" (incoming, no caller ID)</li>
+ * </ul>
+ * For a given call, the most specific matching rule wins (a number or hidden
+ * rule beats an "anyone" rule); on a tie, block wins.
  */
 public final class RuleStore {
-    public static final String MODE_ALL = "all";
-    public static final String MODE_BLOCKLIST = "blocklist";
-    public static final String MODE_ALLOWLIST = "allowlist";
+    public static final String OUTGOING = "outgoing";
+    public static final String INCOMING = "incoming";
+    public static final String BOTH = "both";
 
-    public static final String DIRECTION_OUTGOING = "outgoing";
-    public static final String DIRECTION_INCOMING = "incoming";
-    public static final String DIRECTION_BOTH = "both";
+    public static final String BLOCK = "block";
+    public static final String ALLOW = "allow";
+
+    public static final String TARGET_NUMBER = "number";
+    public static final String TARGET_ANYONE = "anyone";
+    public static final String TARGET_HIDDEN = "hidden";
 
     /** Log entry directions. */
     public static final String OUT = "out";
@@ -30,10 +43,7 @@ public final class RuleStore {
 
     private static final String PREFS = "gently.callguard";
     private static final String KEY_ENABLED = "enabled";
-    private static final String KEY_MODE = "mode";
-    private static final String KEY_NUMBERS = "numbers";
-    private static final String KEY_DIRECTION = "direction";
-    private static final String KEY_BLOCK_HIDDEN = "blockHidden";
+    private static final String KEY_RULES = "rules";
     private static final String KEY_LOG = "log";
     private static final int LOG_LIMIT = 200;
 
@@ -41,68 +51,83 @@ public final class RuleStore {
 
     public RuleStore(Context context) {
         prefs = context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        migrateLegacy();
     }
 
     public boolean isEnabled() {
         return prefs.getBoolean(KEY_ENABLED, false);
     }
 
-    public String getMode() {
-        return prefs.getString(KEY_MODE, MODE_BLOCKLIST);
+    public JSONArray getRules() {
+        return parseArray(prefs.getString(KEY_RULES, "[]"));
     }
 
-    public JSONArray getNumbers() {
-        return parseArray(prefs.getString(KEY_NUMBERS, "[]"));
-    }
-
-    public String getDirection() {
-        return prefs.getString(KEY_DIRECTION, DIRECTION_OUTGOING);
-    }
-
-    public boolean isBlockHidden() {
-        return prefs.getBoolean(KEY_BLOCK_HIDDEN, false);
-    }
-
-    public void save(boolean enabled, String mode, String direction, boolean blockHidden, JSONArray numbers) {
+    public void save(boolean enabled, JSONArray rules) {
         prefs.edit()
             .putBoolean(KEY_ENABLED, enabled)
-            .putString(KEY_MODE, mode)
-            .putString(KEY_DIRECTION, direction)
-            .putBoolean(KEY_BLOCK_HIDDEN, blockHidden)
-            .putString(KEY_NUMBERS, numbers.toString())
+            .putString(KEY_RULES, rules.toString())
             .apply();
     }
 
-    /** Decides whether an outgoing call to {@code number} must be cancelled. */
-    public boolean shouldBlockOutgoing(String number) {
-        return isEnabled() && !DIRECTION_INCOMING.equals(getDirection()) && matches(number);
-    }
-
-    /**
-     * Decides whether an incoming call from {@code number} must be rejected.
-     * A null/empty number is a hidden caller, governed only by blockHidden.
-     */
-    public boolean shouldBlockIncoming(String number) {
-        if (!isEnabled() || DIRECTION_OUTGOING.equals(getDirection())) return false;
-        if (number == null || digits(number).isEmpty()) return isBlockHidden();
-        return matches(number);
-    }
-
-    private boolean matches(String number) {
-        String mode = getMode();
-        if (MODE_ALL.equals(mode)) return true;
-
-        boolean listed = isListed(number);
-        return MODE_ALLOWLIST.equals(mode) ? !listed : listed;
-    }
-
-    private boolean isListed(String number) {
-        JSONArray numbers = getNumbers();
-        for (int i = 0; i < numbers.length(); i++) {
-            JSONObject entry = numbers.optJSONObject(i);
-            if (entry != null && sameNumber(number, entry.optString("number"))) return true;
+    /** Whether any rule needs the given call direction intercepted. */
+    public boolean needs(String direction) {
+        JSONArray rules = getRules();
+        for (int i = 0; i < rules.length(); i++) {
+            JSONObject rule = rules.optJSONObject(i);
+            if (rule != null && covers(rule.optString("direction"), direction)) return true;
         }
         return false;
+    }
+
+    public boolean shouldBlockOutgoing(String number) {
+        return shouldBlock(OUTGOING, number);
+    }
+
+    /** A null/empty number is a hidden caller. */
+    public boolean shouldBlockIncoming(String number) {
+        return shouldBlock(INCOMING, number);
+    }
+
+    private boolean shouldBlock(String direction, String number) {
+        if (!isEnabled()) return false;
+        boolean hidden = number == null || digits(number).isEmpty();
+
+        int bestRank = -1;
+        boolean block = false;
+        JSONArray rules = getRules();
+        for (int i = 0; i < rules.length(); i++) {
+            JSONObject rule = rules.optJSONObject(i);
+            if (rule == null || !covers(rule.optString("direction"), direction)) continue;
+
+            int rank = matchRank(rule, number, hidden);
+            if (rank < 0) continue;
+            boolean ruleBlocks = !ALLOW.equals(rule.optString("action"));
+            if (rank > bestRank) {
+                bestRank = rank;
+                block = ruleBlocks;
+            } else if (rank == bestRank) {
+                block = block || ruleBlocks;
+            }
+        }
+        return block;
+    }
+
+    /** -1 = no match, 0 = matched by "anyone", 1 = matched specifically. */
+    private static int matchRank(JSONObject rule, String number, boolean hidden) {
+        switch (rule.optString("target")) {
+            case TARGET_ANYONE:
+                return 0;
+            case TARGET_HIDDEN:
+                return hidden ? 1 : -1;
+            case TARGET_NUMBER:
+                return !hidden && sameNumber(number, rule.optString("number")) ? 1 : -1;
+            default:
+                return -1;
+        }
+    }
+
+    private static boolean covers(String ruleDirection, String callDirection) {
+        return BOTH.equals(ruleDirection) || callDirection.equals(ruleDirection);
     }
 
     /**
@@ -132,7 +157,10 @@ public final class RuleStore {
         JSONArray log = getLog();
         List<JSONObject> entries = new ArrayList<>();
         try {
-            entries.add(new JSONObject().put("number", number == null ? "" : number).put("direction", direction).put("at", System.currentTimeMillis()));
+            entries.add(new JSONObject()
+                .put("number", number == null ? "" : number)
+                .put("direction", direction)
+                .put("at", System.currentTimeMillis()));
         } catch (JSONException ignored) {
             return;
         }
@@ -145,6 +173,49 @@ public final class RuleStore {
 
     public void clearLog() {
         prefs.edit().putString(KEY_LOG, "[]").apply();
+    }
+
+    /**
+     * Converts the old single-setting format (mode + direction + blockHidden +
+     * numbers) into rules, once.
+     */
+    private void migrateLegacy() {
+        if (prefs.contains(KEY_RULES) || !prefs.contains("mode")) return;
+        String mode = prefs.getString("mode", "blocklist");
+        String direction = prefs.getString("direction", OUTGOING);
+        JSONArray numbers = parseArray(prefs.getString("numbers", "[]"));
+        JSONArray rules = new JSONArray();
+        try {
+            if (!"blocklist".equals(mode)) rules.put(rule(BLOCK, direction, TARGET_ANYONE, null, null));
+            if (!"all".equals(mode)) {
+                String action = "allowlist".equals(mode) ? ALLOW : BLOCK;
+                for (int i = 0; i < numbers.length(); i++) {
+                    JSONObject n = numbers.optJSONObject(i);
+                    if (n != null) rules.put(rule(action, direction, TARGET_NUMBER, n.optString("number"), n.optString("label", null)));
+                }
+            }
+            if (prefs.getBoolean("blockHidden", false) && !OUTGOING.equals(direction)) {
+                rules.put(rule(BLOCK, INCOMING, TARGET_HIDDEN, null, null));
+            }
+        } catch (JSONException e) {
+            return;
+        }
+        prefs.edit()
+            .putString(KEY_RULES, rules.toString())
+            .remove("mode").remove("direction").remove("blockHidden").remove("numbers")
+            .apply();
+    }
+
+    private static JSONObject rule(String action, String direction, String target, String number, String label)
+        throws JSONException {
+        JSONObject rule = new JSONObject()
+            .put("id", UUID.randomUUID().toString())
+            .put("action", action)
+            .put("direction", direction)
+            .put("target", target);
+        if (number != null) rule.put("number", number);
+        if (label != null && !label.isEmpty()) rule.put("label", label);
+        return rule;
     }
 
     private static JSONArray parseArray(String json) {

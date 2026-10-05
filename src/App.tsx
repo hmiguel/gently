@@ -4,20 +4,29 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { TabBar, type Tab } from './components/TabBar'
 import { tap } from './lib/haptics'
 import { hasPin } from './lib/pin'
-import { CallGuard, type LogEntry, type Permissions, type Rules, type Status } from './plugins/callguard'
+import { CallGuard, type LogEntry, type Permissions, type Rule, type Rules, type Status } from './plugins/callguard'
 import { ContactPicker } from './plugins/contacts'
 import { LockScreen } from './screens/LockScreen'
 import { LogScreen } from './screens/LogScreen'
+import { RuleForm } from './screens/RuleForm'
 import { RulesScreen } from './screens/RulesScreen'
 import { StatusScreen } from './screens/StatusScreen'
 
 type Phase = 'loading' | 'setup' | 'locked' | 'open'
+
+/** The rule form layered over the tabs. `id: null` creates a new rule. */
+type Overlay = { id: string | null }
 
 export default function App() {
   const [phase, setPhase] = useState<Phase>('loading')
   const [tab, setTab] = useState<Tab>('status')
   const [status, setStatus] = useState<Status | null>(null)
   const [log, setLog] = useState<LogEntry[]>([])
+  const [overlay, setOverlay] = useState<Overlay | null>(null)
+  const overlayRef = useRef(overlay)
+  useEffect(() => {
+    overlayRef.current = overlay
+  }, [overlay])
   // System dialogs (permissions, contact picker) background the app; that must not lock it.
   const expectingSystemDialog = useRef(false)
 
@@ -54,6 +63,17 @@ export default function App() {
     }
   }, [refresh])
 
+  // Android back closes the open form; otherwise it backgrounds the app.
+  useEffect(() => {
+    const sub = CapApp.addListener('backButton', () => {
+      if (overlayRef.current) setOverlay(null)
+      else CapApp.minimizeApp()
+    })
+    return () => {
+      sub.then((s) => s.remove())
+    }
+  }, [])
+
   const saveRules = async (rules: Rules) => {
     setStatus((s) => (s ? { ...s, ...rules } : s)) // optimistic
     setStatus(await CallGuard.setRules(rules))
@@ -79,13 +99,8 @@ export default function App() {
     )
   }
 
-  const rules: Rules | null = status && {
-    enabled: status.enabled,
-    mode: status.mode,
-    direction: status.direction,
-    blockHidden: status.blockHidden,
-    numbers: status.numbers,
-  }
+  const rules: Rules | null = status && { enabled: status.enabled, rules: status.rules }
+  const saveRuleList = (list: Rule[]) => rules && saveRules({ ...rules, rules: list })
 
   return (
     <div className="flex h-full flex-col">
@@ -117,13 +132,20 @@ export default function App() {
                 log={log}
                 onToggle={() => saveRules({ ...rules, enabled: !rules.enabled })}
                 onRequestPermission={requestPermission}
+                onAddRule={() => setOverlay({ id: null })}
               />
             )}
-            {tab === 'rules' && <RulesScreen rules={rules} onChange={saveRules} onPickContact={pickContact} />}
+            {tab === 'rules' && (
+              <RulesScreen
+                rules={rules.rules}
+                onOpen={(id) => setOverlay({ id })}
+                onCreate={() => setOverlay({ id: null })}
+              />
+            )}
             {tab === 'log' && (
               <LogScreen
                 log={log}
-                numbers={status.numbers}
+                rules={status.rules}
                 onClear={async () => {
                   await CallGuard.clearLog()
                   setLog([])
@@ -135,6 +157,29 @@ export default function App() {
       </main>
 
       <TabBar active={tab} onChange={setTab} />
+
+      {rules && overlay && (
+        <RuleForm
+          key={overlay.id ?? 'new'}
+          rule={rules.rules.find((r) => r.id === overlay.id)}
+          others={rules.rules.filter((r) => r.id !== overlay.id)}
+          onPickContact={pickContact}
+          onClose={() => setOverlay(null)}
+          onSave={(rule) => {
+            const exists = rules.rules.some((r) => r.id === rule.id)
+            saveRuleList(exists ? rules.rules.map((r) => (r.id === rule.id ? rule : r)) : [...rules.rules, rule])
+            setOverlay(null)
+          }}
+          onDelete={
+            overlay.id === null
+              ? undefined
+              : () => {
+                  saveRuleList(rules.rules.filter((r) => r.id !== overlay.id))
+                  setOverlay(null)
+                }
+          }
+        />
+      )}
     </div>
   )
 }

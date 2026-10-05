@@ -2,9 +2,9 @@
 
 Android app that blocks outgoing and incoming calls, protected by an access code.
 
-- **Direction:** outgoing, incoming, or both
-- **Modes:** block all calls, block a list of numbers, or allow only a list of numbers
-- **Hidden numbers:** optionally reject incoming calls with no caller ID
+- **Rules:** each rule says *block* or *allow*, *outgoing / incoming / both*, and *who*: one number
+  (picked from contacts or typed), anyone, or hidden callers. A rule for a specific number wins over a
+  rule for anyone, so "block all outgoing" + "allow Mom" works as an allowlist
 - **Access code:** 6 digits, stored as a salted PBKDF2 hash, with an escalating lockout after 5 wrong attempts
 - **Log:** every blocked attempt, with time and number
 - Emergency numbers are never blocked (Android enforces this)

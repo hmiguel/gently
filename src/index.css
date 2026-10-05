@@ -18,6 +18,15 @@
   --radius-*: initial;
 
   --ease-mech: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Forms slide up as one rigid plane: no fade, no bounce. */
+  --animate-sheet-in: sheet-in 200ms var(--ease-mech);
+
+  @keyframes sheet-in {
+    from {
+      transform: translateY(100%);
+    }
+  }
 }
 
 @layer base {

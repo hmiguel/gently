@@ -5,21 +5,29 @@ import { registerPlugin, WebPlugin } from '@capacitor/core'
  * android/app/src/main/java/com/hmiguel/gently/callguard/CallGuardPlugin.java.
  * An iOS implementation can later report different `capabilities()`.
  */
-export type Mode = 'all' | 'blocklist' | 'allowlist'
 export type Direction = 'outgoing' | 'incoming' | 'both'
+export type Action = 'block' | 'allow'
+/** One number, everyone, or incoming calls without caller ID. */
+export type Target = 'number' | 'anyone' | 'hidden'
 
-export interface NumberEntry {
-  number: string
+/**
+ * One rule. For a given call the most specific matching rule wins (number or
+ * hidden beats anyone); on a tie, block wins. Mirrors RuleStore.java.
+ */
+export interface Rule {
+  id: string
+  action: Action
+  direction: Direction
+  target: Target
+  /** Only for target 'number'. */
+  number?: string
   label?: string
 }
 
 export interface Rules {
+  /** Master switch: when off, no rule applies. */
   enabled: boolean
-  mode: Mode
-  direction: Direction
-  /** Reject incoming calls with no caller number. */
-  blockHidden: boolean
-  numbers: NumberEntry[]
+  rules: Rule[]
 }
 
 /** OS grants per direction: call redirection (outgoing), call screening (incoming). */
@@ -41,9 +49,10 @@ export interface LogEntry {
   at: number
 }
 
-/** Which OS grants the chosen direction depends on. */
-export function requiredPermissions(direction: Direction): (keyof Permissions)[] {
-  return direction === 'both' ? ['outgoing', 'incoming'] : [direction]
+/** Which OS grants the current rules depend on. */
+export function requiredPermissions(rules: Rule[]): (keyof Permissions)[] {
+  const needs = (d: keyof Permissions) => rules.some((r) => r.direction === d || r.direction === 'both')
+  return (['outgoing', 'incoming'] as const).filter(needs)
 }
 
 export interface Capabilities {
@@ -78,10 +87,7 @@ class CallGuardWeb extends WebPlugin implements CallGuardPlugin {
     return {
       permissions: { outgoing: false, incoming: false },
       enabled: false,
-      mode: 'blocklist',
-      direction: 'outgoing',
-      blockHidden: false,
-      numbers: [],
+      rules: [],
       log: [],
     }
   }

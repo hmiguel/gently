@@ -1,5 +1,5 @@
 import { App as CapApp } from '@capacitor/app'
-import { Lock } from 'lucide-react'
+import { Info, Lock } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { TabBar, type Tab } from './components/TabBar'
 import { tap } from './lib/haptics'
@@ -8,14 +8,15 @@ import { CallGuard, type LogEntry, type Permissions, type Rule, type Rules, type
 import { ContactPicker } from './plugins/contacts'
 import { LockScreen } from './screens/LockScreen'
 import { LogScreen } from './screens/LogScreen'
+import { AboutScreen } from './screens/AboutScreen'
 import { RuleForm } from './screens/RuleForm'
 import { RulesScreen } from './screens/RulesScreen'
 import { StatusScreen } from './screens/StatusScreen'
 
 type Phase = 'loading' | 'setup' | 'locked' | 'open'
 
-/** The rule form layered over the tabs. `id: null` creates a new rule. */
-type Overlay = { id: string | null }
+/** Full-screen pages layered over the tabs. A rule with `id: null` is a new one. */
+type Overlay = { kind: 'rule'; id: string | null } | { kind: 'about' }
 
 export default function App() {
   const [phase, setPhase] = useState<Phase>('loading')
@@ -109,17 +110,30 @@ export default function App() {
           <span className="text-xl font-black uppercase tracking-tighter">
             Gently<span className="text-accent">.</span>
           </span>
-          <button
-            type="button"
-            aria-label="Lock app"
-            onClick={() => {
-              tap()
-              setPhase('locked')
-            }}
-            className="flex size-11 items-center justify-center transition-colors duration-150 ease-linear active:bg-ink active:text-paper"
-          >
-            <Lock strokeWidth={2.5} className="size-5" />
-          </button>
+          <div className="flex">
+            <button
+              type="button"
+              aria-label="About Gently"
+              onClick={() => {
+                tap()
+                setOverlay({ kind: 'about' })
+              }}
+              className="flex size-11 items-center justify-center transition-colors duration-150 ease-linear active:bg-ink active:text-paper"
+            >
+              <Info strokeWidth={2.5} className="size-5" />
+            </button>
+            <button
+              type="button"
+              aria-label="Lock app"
+              onClick={() => {
+                tap()
+                setPhase('locked')
+              }}
+              className="flex size-11 items-center justify-center transition-colors duration-150 ease-linear active:bg-ink active:text-paper"
+            >
+              <Lock strokeWidth={2.5} className="size-5" />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -132,14 +146,14 @@ export default function App() {
                 log={log}
                 onToggle={() => saveRules({ ...rules, enabled: !rules.enabled })}
                 onRequestPermission={requestPermission}
-                onAddRule={() => setOverlay({ id: null })}
+                onAddRule={() => setOverlay({ kind: 'rule', id: null })}
               />
             )}
             {tab === 'rules' && (
               <RulesScreen
                 rules={rules.rules}
-                onOpen={(id) => setOverlay({ id })}
-                onCreate={() => setOverlay({ id: null })}
+                onOpen={(id) => setOverlay({ kind: 'rule', id })}
+                onCreate={() => setOverlay({ kind: 'rule', id: null })}
               />
             )}
             {tab === 'log' && (
@@ -158,7 +172,8 @@ export default function App() {
 
       <TabBar active={tab} onChange={setTab} />
 
-      {rules && overlay && (
+      {overlay?.kind === 'about' && <AboutScreen onClose={() => setOverlay(null)} />}
+      {rules && overlay?.kind === 'rule' && (
         <RuleForm
           key={overlay.id ?? 'new'}
           rule={rules.rules.find((r) => r.id === overlay.id)}

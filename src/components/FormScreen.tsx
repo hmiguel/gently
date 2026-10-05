@@ -20,7 +20,8 @@ export function FormScreen({
   title: ReactNode
   onClose: () => void
   children: ReactNode
-  actions: ReactNode
+  /** Pinned to the bottom; omit for read-only screens. */
+  actions?: ReactNode
 }) {
   return (
     <div
@@ -51,9 +52,13 @@ export function FormScreen({
         {children}
       </div>
 
-      <footer className="pb-safe border-t-4 border-ink bg-paper">
-        <div className="space-y-3 px-6 py-4">{actions}</div>
-      </footer>
+      {actions ? (
+        <footer className="pb-safe border-t-4 border-ink bg-paper">
+          <div className="space-y-3 px-6 py-4">{actions}</div>
+        </footer>
+      ) : (
+        <div className="pb-safe" />
+      )}
     </div>
   )
 }

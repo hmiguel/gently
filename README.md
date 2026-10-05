@@ -106,6 +106,8 @@ Store copy, Data safety answers and the privacy policy draft are in `docs/`. Gra
 `resources/store/`; regenerate them with `npm run assets` and (with `npx vite --port 5199` running)
 `npm run screenshots`.
 
+> Build, release and debugging notes for maintainers and coding agents: [AGENTS.md](AGENTS.md).
+
 ## GitHub releases (APK)
 
 Pushing a version tag builds a signed APK and attaches it to a GitHub Release

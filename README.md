@@ -106,3 +106,20 @@ Store copy, Data safety answers and the privacy policy draft are in `docs/`. Gra
 `resources/store/`; regenerate them with `npm run assets` and (with `npx vite --port 5199` running)
 `npm run screenshots`.
 
+## GitHub releases (APK)
+
+Pushing a version tag builds a signed APK and attaches it to a GitHub Release
+(`.github/workflows/release.yml`):
+
+```sh
+npm version patch          # bumps package.json, commits, tags v1.0.1
+git push --follow-tags
+```
+
+These APKs are signed with a separate **GitHub release key** (repo secrets `GH_RELEASE_*`; local
+backup in `~/.android-keys/gently-github.*`), not the Play upload key. Play re-signs its builds with
+Google's key, so a GitHub APK and a Play install can't update each other.
+
+A manual run (Actions → Release APK → Run workflow) builds the APK as a downloadable artifact without
+creating a release.
+

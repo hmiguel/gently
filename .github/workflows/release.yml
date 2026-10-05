@@ -1,0 +1,92 @@
+# Builds a signed APK and publishes it as a GitHub Release.
+#
+# Trigger: push a version tag, e.g. `npm version patch && git push --follow-tags`.
+# The tag must match package.json ("v1.0.1" <-> "1.0.1").
+#
+# Signed with the GitHub-release key (secrets GH_RELEASE_*), not the Play upload key.
+# Play re-signs its builds with Google's key, so a GitHub APK and a Play install
+# can't update each other: uninstall one to switch.
+name: Release APK
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch: # manual run: builds the APK as a downloadable artifact, no release
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Read version
+        id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Check tag matches package.json
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          if [ "${GITHUB_REF_NAME}" != "v${{ steps.version.outputs.version }}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match package.json version ${{ steps.version.outputs.version }}"
+            exit 1
+          fi
+
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync android
+
+      - name: Signing config
+        env:
+          KEYSTORE_BASE64: ${{ secrets.GH_RELEASE_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.GH_RELEASE_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.GH_RELEASE_KEY_ALIAS }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
+          cat > android/keystore.properties <<EOF
+          storeFile=$RUNNER_TEMP/release.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEYSTORE_PASSWORD
+          EOF
+
+      - name: Build APK
+        working-directory: android
+        run: ./gradlew :app:assembleRelease --no-daemon
+
+      - name: Name APK
+        id: apk
+        run: |
+          path="gently-${{ steps.version.outputs.version }}.apk"
+          mv android/app/build/outputs/apk/release/app-release.apk "$path"
+          echo "path=$path" >> "$GITHUB_OUTPUT"
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" "${{ steps.apk.outputs.path }}" --title "Gently $GITHUB_REF_NAME" --generate-notes
+
+      - name: Upload artifact (manual runs)
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.apk.outputs.path }}
+          path: ${{ steps.apk.outputs.path }}
+
+      - name: Remove signing material
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.jks" android/keystore.properties

@@ -1,4 +1,4 @@
-package com.hmiguel.gently.callguard;
+package com.lixo.gently.callguard;
 
 import android.net.Uri;
 import android.telecom.CallRedirectionService;

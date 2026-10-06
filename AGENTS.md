@@ -8,7 +8,7 @@ Product overview and permissions are in [README.md](README.md).
 - `src/`: React + TypeScript + Tailwind v4 UI. Design tokens live only in `src/index.css`
   (Swiss style: paper/ink/muted/accent `#FF3000`, 0 radius, 4px rules, Inter)
 - `src/plugins/`: TypeScript contracts for the native plugins, with browser mocks for `npm run dev`
-- `android/app/src/main/java/com/hmiguel/gently/callguard/`: native rule engine and call services
+- `android/app/src/main/java/com/lixo/gently/callguard/`: native rule engine and call services
   - `RuleStore`: rules + log in SharedPreferences; precedence number/hidden > international > anyone, block wins ties
   - `International`: SIM-country vs E.164 calling code
   - `GentlyRedirectionService` (outgoing), `GentlyScreeningService` (incoming)
@@ -23,7 +23,7 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"  
 npm run dev                       # UI in the browser with mocked plugins
 npm run build && npm run lint     # typecheck + build + oxlint
 npx cap sync android              # copy web build into the Android project
-cd android && ./gradlew :app:assembleDebug                 # installs as "Gently Dev" (com.hmiguel.gently.dev)
+cd android && ./gradlew :app:assembleDebug                 # installs as "Gently Dev" (com.lixo.gently.dev)
 cd android && ./gradlew :app:connectedDebugAndroidTest     # device tests, no calls placed
 ```
 

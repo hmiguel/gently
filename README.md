@@ -27,7 +27,7 @@ There is **no `INTERNET` permission**: rules and the log never leave the device.
 
 - UI: React + TypeScript + Tailwind CSS v4, packaged with [Capacitor](https://capacitorjs.com)
 - Design: Swiss International style. All tokens live in `src/index.css`
-- Native: `android/app/src/main/java/com/hmiguel/gently/callguard/`
+- Native: `android/app/src/main/java/com/lixo/gently/callguard/`
   - `GentlyRedirectionService` uses Android's `CallRedirectionService` (Android 10+) to cancel matching calls from any dialer
   - `GentlyScreeningService` uses `CallScreeningService` to reject matching incoming calls before they ring
   - `RuleStore` holds the rules and log in SharedPreferences, so blocking keeps working while the app is closed
@@ -57,7 +57,7 @@ On first launch: set the access code, create a rule, then use **Grant access** o
 choose Gently as the call redirection app (outgoing) and/or the caller ID & spam app, then allow Contacts
 (incoming).
 
-Debug builds install as **Gently Dev** (`com.hmiguel.gently.dev`) next to the release app.
+Debug builds install as **Gently Dev** (`com.lixo.gently.dev`) next to the release app.
 
 Device tests (rule precedence, international detection; they place no calls, and the international
 cases only run with a Portuguese SIM):

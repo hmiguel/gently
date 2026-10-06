@@ -10,10 +10,10 @@ def keystoreFile = rootProject.file('keystore.properties')
 if (keystoreFile.exists()) keystoreFile.withInputStream { keystoreProps.load(it) }
 
 android {
-    namespace = "com.hmiguel.gently"
+    namespace = "com.lixo.gently"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.hmiguel.gently"
+        applicationId "com.lixo.gently"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode vMajor * 10000 + vMinor * 100 + vPatch

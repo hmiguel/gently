@@ -2,7 +2,7 @@ import { registerPlugin, WebPlugin } from '@capacitor/core'
 
 /**
  * Platform-neutral contract for call blocking. Android implements it in
- * android/app/src/main/java/com/hmiguel/gently/callguard/CallGuardPlugin.java.
+ * android/app/src/main/java/com/lixo/gently/callguard/CallGuardPlugin.java.
  * An iOS implementation can later report different `capabilities()`.
  */
 export type Direction = 'outgoing' | 'incoming' | 'both'

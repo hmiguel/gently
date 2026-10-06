@@ -2,7 +2,7 @@ import { registerPlugin, WebPlugin } from '@capacitor/core'
 
 /**
  * System contact picker for one phone number. Android implements it in
- * android/app/src/main/java/com/hmiguel/gently/callguard/ContactPickerPlugin.java.
+ * android/app/src/main/java/com/lixo/gently/callguard/ContactPickerPlugin.java.
  */
 export interface PickedContact {
   number: string

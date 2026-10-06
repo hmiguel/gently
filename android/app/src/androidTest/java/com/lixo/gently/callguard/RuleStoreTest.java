@@ -1,4 +1,4 @@
-package com.hmiguel.gently.callguard;
+package com.lixo.gently.callguard;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

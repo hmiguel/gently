@@ -1,4 +1,4 @@
-package com.hmiguel.gently.callguard;
+package com.lixo.gently.callguard;
 
 import android.Manifest;
 import android.app.role.RoleManager;

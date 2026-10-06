@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <!-- app_name and title_activity_main come from build.gradle, so debug builds read "Gently Dev". -->
-    <string name="package_name">com.hmiguel.gently</string>
-    <string name="custom_url_scheme">com.hmiguel.gently</string>
+    <string name="package_name">com.lixo.gently</string>
+    <string name="custom_url_scheme">com.lixo.gently</string>
 </resources>

@@ -34,7 +34,8 @@ There is **no `INTERNET` permission**: rules and the log never leave the device.
 ## Stack
 
 - UI: React + TypeScript + Tailwind CSS v4, packaged with [Capacitor](https://capacitorjs.com)
-- Design: Swiss International style. Tokens live in `src/styles/tokens.css` (shared with the website)
+- Design: Swiss International style, based on a design prompt from [designprompts.dev](https://www.designprompts.dev/).
+  Tokens live in `src/styles/tokens.css` (shared with the website)
 - UI text: `src/i18n/` (English, Português, Español, Français, Deutsch)
 - Native: `android/app/src/main/java/com/lixo/gently/callguard/`
   - `GentlyRedirectionService` uses Android's `CallRedirectionService` (Android 10+) to cancel matching calls from any dialer
@@ -124,5 +125,6 @@ useful, but WITHOUT ANY WARRANTY; see the license for details.
 
 The Inter typeface is licensed under the SIL Open Font License 1.1.
 
-Built with [Claude Code](https://claude.com/claude-code).
+Built with [Claude Code](https://claude.com/claude-code). Design prompt from
+[designprompts.dev](https://www.designprompts.dev/).
 

@@ -94,8 +94,8 @@ npm run release
 
 - Local signing: `android/keystore.properties` (git-ignored, never commit). Play App Signing holds the
   real app key; the upload key can be reset through Play Console support
-- Store copy, Data safety answers: `docs/store-listing.md`. Privacy policy: `docs/privacy-policy.md`,
-  published as a gist (URL in the file header); update the gist when the policy changes
+- Store copy, Data safety answers: `docs/store-listing.md`. Privacy policy: the website's
+  privacy page (https://gently.lixo.dev/privacy/, text in `website/src/i18n/`) is the one Play links to
 - Graphics: `npm run assets` (icons, feature graphic); `npm run screenshots` with
   `npx vite --port 5199` running (1080×1920, demo data, never real contacts)
 

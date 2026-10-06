@@ -94,7 +94,7 @@ export function LogScreen({
               onBlur={() => setConfirming(false)}
             >
               {confirming ? m.log.confirmClear : m.log.clear}
-              <span className="text-label">{String(log.length).padStart(2, '0')}</span>
+              <span className={`size-4 ${confirming ? 'bg-paper' : 'border-2 border-current'}`} aria-hidden />
             </Button>
           </section>
         </>

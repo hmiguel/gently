@@ -131,6 +131,6 @@ export const de: Site = {
     contactTitle: 'Noch Fragen?',
     contactBody: 'Schreib uns und nenn dein Handymodell und deine Android-Version.',
   },
-  footer: { source: 'Quellcode', openSource: 'Open Source (GPL-3.0)', made: 'In Europa gemacht von hmiguel' },
+  footer: { source: 'Quellcode', openSource: 'Open Source (GPL-3.0)', made: 'In Europa gemacht' },
   notFound: { title: 'Nicht da.', body: 'Diese Seite gibt es nicht.', home: 'Zur Startseite' },
 }

@@ -5,7 +5,8 @@ No ads, no account, no internet access.
 
 **Website:** [gently.lixo.dev](https://gently.lixo.dev) ·
 **Google Play:** [closed test](https://play.google.com/apps/testing/com.lixo.gently) ·
-**License:** [GPL-3.0-or-later](LICENSE)
+**License:** [GPL-3.0-or-later](LICENSE) ·
+**Sponsor:** [github.com/sponsors/hmiguel](https://github.com/sponsors/hmiguel)
 
 - **Rules:** each rule says *block* or *allow*, *outgoing / incoming / both*, and *who*: one number
   (picked from contacts or typed), anyone, international numbers (outside the SIM's country), or hidden

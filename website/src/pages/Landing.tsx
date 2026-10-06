@@ -1,4 +1,4 @@
-import { features, SCREEN_WIDTHS, SCREENS } from '../content'
+import { features, SCREEN_WIDTHS, SCREENS, SPONSOR_URL } from '../content'
 import { Blocks, Display, JoinButton, SectionLabel } from '../layout'
 import { pathFor, texts, type Lang } from '../i18n'
 
@@ -120,6 +120,24 @@ export function Landing({ lang }: { lang: Lang }) {
           <div className="lg:justify-self-end">
             <JoinButton lang={lang} />
           </div>
+        </div>
+      </section>
+
+      {/* Optional sponsorship; the app itself stays free and ad-free. */}
+      <section className="swiss-diagonal border-t-4 border-ink bg-muted">
+        <div className="mx-auto grid max-w-6xl gap-8 px-6 py-14 lg:grid-cols-2 lg:items-end">
+          <div>
+            <SectionLabel index="05">{s.footer.sponsor}</SectionLabel>
+            <h2 className="mt-4 text-4xl font-black uppercase leading-[0.9] tracking-tighter">{s.home.sponsorTitle}</h2>
+            <p className="mt-4 max-w-xl text-lg font-medium text-ink/70">{s.home.sponsorBody}</p>
+          </div>
+          <a
+            href={SPONSOR_URL}
+            className="inline-flex h-16 w-full items-center justify-between gap-6 border-4 border-ink bg-paper px-6 text-sm font-bold uppercase tracking-[0.15em] transition-colors duration-150 ease-linear hover:bg-ink hover:text-paper sm:w-auto lg:justify-self-end"
+          >
+            {s.home.sponsorCta}
+            <span aria-hidden className="text-accent">♥</span>
+          </a>
         </div>
       </section>
     </>

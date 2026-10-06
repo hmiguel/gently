@@ -17,6 +17,9 @@ export const de: Site = {
     note: 'Im geschlossenen Test bei Google Play · Android 10+',
   },
   home: {
+    sponsorTitle: 'Damit es kostenlos bleibt',
+    sponsorBody: 'Gently ist kostenlos und werbefrei, für immer. Wenn es dir hilft, kannst du die Entwicklung unterstützen.',
+    sponsorCta: 'Auf GitHub unterstützen',
     promise: 'Kostenlos und werbefrei. Für immer.',
     tagline: 'Sperr die Anrufe, die du willst: ausgehend, eingehend oder international, mit einfachen Regeln.',
     title: ['Sperre', 'aktiv.'],
@@ -131,6 +134,6 @@ export const de: Site = {
     contactTitle: 'Noch Fragen?',
     contactBody: 'Schreib uns und nenn dein Handymodell und deine Android-Version.',
   },
-  footer: { source: 'Quellcode', openSource: 'Open Source (GPL-3.0)' },
+  footer: { sponsor: 'Unterstützen', source: 'Quellcode', openSource: 'Open Source (GPL-3.0)' },
   notFound: { title: 'Nicht da.', body: 'Diese Seite gibt es nicht.', home: 'Zur Startseite' },
 }

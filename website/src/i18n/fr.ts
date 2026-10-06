@@ -17,6 +17,9 @@ export const fr: Site = {
     note: 'En test fermé sur Google Play · Android 10+',
   },
   home: {
+    sponsorTitle: 'Garder Gently gratuit',
+    sponsorBody: "Gently est gratuit et sans pub, pour toujours. S'il vous est utile, vous pouvez soutenir son développement.",
+    sponsorCta: 'Soutenir sur GitHub',
     promise: 'Gratuit et sans pub. Pour toujours.',
     tagline: 'Bloquez les appels de votre choix : sortants, entrants ou internationaux, avec des règles simples.',
     title: ['Appels', 'bloqués.'],
@@ -131,6 +134,6 @@ export const fr: Site = {
     contactTitle: 'Toujours bloqué ?',
     contactBody: 'Écrivez-nous en indiquant le modèle de votre téléphone et la version d’Android.',
   },
-  footer: { source: 'Code source', openSource: 'Open source (GPL-3.0)' },
+  footer: { sponsor: 'Soutenir', source: 'Code source', openSource: 'Open source (GPL-3.0)' },
   notFound: { title: 'Introuvable.', body: "Cette page n'existe pas.", home: "Aller à la page d'accueil" },
 }

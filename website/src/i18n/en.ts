@@ -27,6 +27,9 @@ export const en = {
     note: 'In closed testing on Google Play · Android 10+',
   },
   home: {
+    sponsorTitle: 'Keep it free',
+    sponsorBody: 'Gently is free and ad-free, forever. If it helps you, you can support its development.',
+    sponsorCta: 'Sponsor on GitHub',
     promise: 'Free and ad-free. Forever.',
     tagline: 'Block the calls you choose: outgoing, incoming or international, with simple rules.',
     title: ['Calls', 'blocked.'],
@@ -138,7 +141,7 @@ export const en = {
     contactTitle: 'Still stuck?',
     contactBody: 'Write to us and include your phone model and Android version.',
   },
-  footer: { source: 'Source code', openSource: 'Open source (GPL-3.0)' },
+  footer: { sponsor: 'Sponsor', source: 'Source code', openSource: 'Open source (GPL-3.0)' },
   notFound: { title: 'Not found.', body: 'This page does not exist.', home: 'Go to the home page' },
 }
 

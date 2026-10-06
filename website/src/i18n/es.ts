@@ -17,6 +17,9 @@ export const es: Site = {
     note: 'En prueba cerrada en Google Play · Android 10+',
   },
   home: {
+    sponsorTitle: 'Que siga gratis',
+    sponsorBody: 'Gently es gratis y sin anuncios, para siempre. Si te resulta útil, puedes apoyar su desarrollo.',
+    sponsorCta: 'Apoyar en GitHub',
     promise: 'Gratis y sin anuncios. Para siempre.',
     tagline: 'Bloquea las llamadas que elijas: salientes, entrantes o internacionales, con reglas sencillas.',
     title: ['Bloqueo', 'activo.'],
@@ -131,6 +134,6 @@ export const es: Site = {
     contactTitle: '¿Sigues con dudas?',
     contactBody: 'Escríbenos e indica el modelo de tu móvil y la versión de Android.',
   },
-  footer: { source: 'Código fuente', openSource: 'Código abierto (GPL-3.0)' },
+  footer: { sponsor: 'Apoyar', source: 'Código fuente', openSource: 'Código abierto (GPL-3.0)' },
   notFound: { title: 'No existe.', body: 'Esta página no existe.', home: 'Ir a la página de inicio' },
 }

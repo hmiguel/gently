@@ -9,6 +9,7 @@ import type { Block } from './i18n/en'
 /** Kept in English in every language, by choice. */
 export const MADE_IN = 'Made in Europe'
 export const SOURCE_URL = 'https://github.com/hmiguel/gently'
+export const SPONSOR_URL = 'https://github.com/sponsors/hmiguel'
 export const LICENSE_URL = 'https://www.gnu.org/licenses/gpl-3.0.html'
 export const SCREENS = ['02-status', '03-rules', '04-rule-form', '05-log']
 /** Widths prerender.mjs generates for every screenshot (WebP). */
@@ -85,7 +86,7 @@ export function renderMarkdown(lang: Lang, page: Page) {
       .map((f) => `### ${f.title}\n\n${f.body}`)
       .join('\n\n') +
     `\n\n## ${app.about.privacy}\n\n**${app.about.privacyTitle.join(' ')}** ${app.about.privacyBody}\n\n` +
-    `## ${s.nav.support}\n\n- [${s.nav.support}](${url(lang, 'support')})\n- [${s.nav.privacy}](${url(lang, 'privacy')})\n- [${s.footer.source}](${SOURCE_URL}) · ${s.footer.openSource}\n`
+    `## ${s.nav.support}\n\n- [${s.nav.support}](${url(lang, 'support')})\n- [${s.nav.privacy}](${url(lang, 'privacy')})\n- [${s.footer.source}](${SOURCE_URL}) · ${s.footer.openSource}\n\n## ${s.home.sponsorTitle}\n\n${s.home.sponsorBody} ${SPONSOR_URL}\n`
   )
 }
 
@@ -107,6 +108,7 @@ Key facts:
 - Emergency numbers are never blocked.
 - Languages: ${LANGS.map((l) => l.name).join(', ')}.
 - Developer: hmiguel (https://github.com/hmiguel), contact ${CONTACT}. Source code: ${SOURCE_URL} (GPL-3.0-or-later).
+- Funding: optional sponsorship at ${SPONSOR_URL}; the app itself stays free and ad-free.
 
 ## Docs
 

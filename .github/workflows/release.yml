@@ -1,42 +1,30 @@
-# Builds a signed APK and publishes it as a GitHub Release.
-#
-# Trigger: push a version tag, e.g. `npm version patch && git push --follow-tags`.
+# Release pipeline. Trigger: `npm version patch && git push --follow-tags`.
 # The tag must match package.json ("v1.0.1" <-> "1.0.1").
 #
-# Signed with the GitHub-release key (secrets GH_RELEASE_*), not the Play upload key.
-# Play re-signs its builds with Google's key, so a GitHub APK and a Play install
-# can't update each other: uninstall one to switch.
-name: Release APK
+#  - apk:  signed with the GitHub-release key (secrets GH_RELEASE_*), published as a GitHub Release.
+#  - play: signed with the Play upload key (secrets PLAY_UPLOAD_*), uploaded to Google Play.
+#          Skipped until the PLAY_SERVICE_ACCOUNT_JSON secret exists. Track defaults to the
+#          closed-testing track "alpha"; override with the repository variable PLAY_TRACK
+#          (internal / alpha / beta / production). Release notes: distribution/whatsnew/.
+#
+# Play re-signs its builds with Google's key, so a GitHub APK and a Play install can't
+# update each other: uninstall one to switch.
+name: Release
 
 on:
   push:
     tags: ['v*']
-  workflow_dispatch: # manual run: builds the APK as a downloadable artifact, no release
-
-permissions:
-  contents: write
+  workflow_dispatch: # manual run: builds the APK as a downloadable artifact only
 
 jobs:
-  apk:
+  version:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 22
-          cache: npm
-
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 21
-          cache: gradle
-
-      - name: Read version
-        id: version
+      - id: version
         run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
-
       - name: Check tag matches package.json
         if: startsWith(github.ref, 'refs/tags/')
         run: |
@@ -45,23 +33,19 @@ jobs:
             exit 1
           fi
 
-      - run: npm ci
-      - run: npm run build
-      - run: npx cap sync android
-
-      - name: Signing config
-        env:
-          KEYSTORE_BASE64: ${{ secrets.GH_RELEASE_KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.GH_RELEASE_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.GH_RELEASE_KEY_ALIAS }}
-        run: |
-          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
-          cat > android/keystore.properties <<EOF
-          storeFile=$RUNNER_TEMP/release.jks
-          storePassword=$KEYSTORE_PASSWORD
-          keyAlias=$KEY_ALIAS
-          keyPassword=$KEYSTORE_PASSWORD
-          EOF
+  apk:
+    needs: version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/prepare
+        with:
+          keystore-base64: ${{ secrets.GH_RELEASE_KEYSTORE_BASE64 }}
+          store-password: ${{ secrets.GH_RELEASE_KEYSTORE_PASSWORD }}
+          key-alias: ${{ secrets.GH_RELEASE_KEY_ALIAS }}
+          key-password: ${{ secrets.GH_RELEASE_KEYSTORE_PASSWORD }}
 
       - name: Build APK
         working-directory: android
@@ -70,11 +54,11 @@ jobs:
       - name: Name APK
         id: apk
         run: |
-          path="gently-${{ steps.version.outputs.version }}.apk"
+          path="gently-${{ needs.version.outputs.version }}.apk"
           mv android/app/build/outputs/apk/release/app-release.apk "$path"
           echo "path=$path" >> "$GITHUB_OUTPUT"
 
-      - name: Publish release
+      - name: Publish GitHub release
         if: startsWith(github.ref, 'refs/tags/')
         env:
           GH_TOKEN: ${{ github.token }}
@@ -86,6 +70,50 @@ jobs:
         with:
           name: ${{ steps.apk.outputs.path }}
           path: ${{ steps.apk.outputs.path }}
+
+      - name: Remove signing material
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.jks" android/keystore.properties
+
+  play:
+    needs: version
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    env:
+      HAS_PLAY: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON != '' }}
+    steps:
+      - name: Skip until Play is connected
+        if: env.HAS_PLAY != 'true'
+        run: echo "::notice::PLAY_SERVICE_ACCOUNT_JSON is not set; skipping the Google Play upload."
+
+      - uses: actions/checkout@v5
+        if: env.HAS_PLAY == 'true'
+
+      - uses: ./.github/actions/prepare
+        if: env.HAS_PLAY == 'true'
+        with:
+          keystore-base64: ${{ secrets.PLAY_UPLOAD_KEYSTORE_BASE64 }}
+          store-password: ${{ secrets.PLAY_UPLOAD_KEYSTORE_PASSWORD }}
+          key-alias: ${{ secrets.PLAY_UPLOAD_KEY_ALIAS }}
+          key-password: ${{ secrets.PLAY_UPLOAD_KEY_PASSWORD }}
+
+      - name: Build AAB
+        if: env.HAS_PLAY == 'true'
+        working-directory: android
+        run: ./gradlew :app:bundleRelease --no-daemon
+
+      - name: Upload to Google Play
+        if: env.HAS_PLAY == 'true'
+        uses: r0adkll/upload-google-play@v1.1.5
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.lixo.gently
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          releaseName: ${{ needs.version.outputs.version }}
+          track: ${{ vars.PLAY_TRACK || 'alpha' }}
+          status: completed
+          whatsNewDirectory: distribution/whatsnew
+          mappingFile: android/app/build/outputs/mapping/release/mapping.txt
 
       - name: Remove signing material
         if: always()

@@ -1,0 +1,49 @@
+# Shared by the release jobs: toolchains, web build, Capacitor sync and a signing
+# config for the given key. Remove android/keystore.properties and the keystore
+# ($RUNNER_TEMP/release.jks) when done.
+name: Prepare Android release build
+description: Install toolchains, build the web app, sync Capacitor and write the signing config
+
+inputs:
+  keystore-base64:
+    description: Base64 of the .jks keystore
+    required: true
+  store-password:
+    required: true
+  key-alias:
+    required: true
+  key-password:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v5
+      with:
+        node-version: 22
+        cache: npm
+
+    - uses: actions/setup-java@v5
+      with:
+        distribution: temurin
+        java-version: 21
+        cache: gradle
+
+    - shell: bash
+      run: npm ci && npm run build && npx cap sync android
+
+    - name: Signing config
+      shell: bash
+      env:
+        KEYSTORE_BASE64: ${{ inputs.keystore-base64 }}
+        STORE_PASSWORD: ${{ inputs.store-password }}
+        KEY_ALIAS: ${{ inputs.key-alias }}
+        KEY_PASSWORD: ${{ inputs.key-password }}
+      run: |
+        echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
+        cat > android/keystore.properties <<EOF
+        storeFile=$RUNNER_TEMP/release.jks
+        storePassword=$STORE_PASSWORD
+        keyAlias=$KEY_ALIAS
+        keyPassword=$KEY_PASSWORD
+        EOF

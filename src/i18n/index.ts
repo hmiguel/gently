@@ -1,18 +1,31 @@
 import { createContext, useContext } from 'react'
 import { en, type Messages } from './en'
+import { es } from './es'
+import { fr } from './fr'
 import { pt } from './pt'
 
+const MESSAGES = { en, pt, es, fr } satisfies Record<string, Messages>
+
+export type LanguageCode = keyof typeof MESSAGES
 /** A specific language, or follow the phone's. */
-export type Language = 'system' | 'en' | 'pt'
+export type Language = 'system' | LanguageCode
 
-/** Shown in their own language so they're recognisable whatever is selected. */
-export const LANGUAGE_NAMES: Record<Exclude<Language, 'system'>, string> = { en: 'English', pt: 'Português' }
+/** Settings order. Names are in their own language so they're recognisable whatever is selected. */
+export const LANGUAGES: { code: LanguageCode; name: string }[] = [
+  { code: 'en', name: 'English' },
+  { code: 'pt', name: 'Português' },
+  { code: 'es', name: 'Español' },
+  { code: 'fr', name: 'Français' },
+]
 
-const MESSAGES: Record<Exclude<Language, 'system'>, Messages> = { en, pt }
+export const isLanguage = (value: unknown): value is Language =>
+  value === 'system' || (typeof value === 'string' && value in MESSAGES)
 
+/** The phone's language when we have it, English otherwise. */
 export function resolveMessages(language: Language): Messages {
   if (language !== 'system') return MESSAGES[language]
-  return navigator.language.toLowerCase().startsWith('pt') ? pt : en
+  const phone = navigator.language.toLowerCase().slice(0, 2)
+  return isLanguage(phone) && phone !== 'system' ? MESSAGES[phone] : en
 }
 
 export interface I18n {

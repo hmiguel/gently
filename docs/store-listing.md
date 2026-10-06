@@ -45,7 +45,7 @@ PRIVATE BY DESIGN
 EMERGENCY CALLS ALWAYS WORK
 Android never lets an app block emergency numbers, and Gently never tries.
 
-Available in English and Portuguese. Requires Android 10 or newer. Gently uses Android's official call redirection and call screening features, which you enable in a single step from the app.
+Available in English, Portuguese, Spanish and French. Requires Android 10 or newer. Gently uses Android's official call redirection and call screening features, which you enable in a single step from the app.
 ```
 
 ## Category & tags

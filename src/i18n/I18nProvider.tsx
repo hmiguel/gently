@@ -1,6 +1,6 @@
 import { Preferences } from '@capacitor/preferences'
 import { useEffect, useState, type ReactNode } from 'react'
-import { I18nContext, resolveMessages, type Language } from '.'
+import { I18nContext, isLanguage, resolveMessages, type Language } from '.'
 
 const KEY = 'gently.language'
 
@@ -10,7 +10,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     Preferences.get({ key: KEY }).then(({ value }) =>
-      setLanguageState(value === 'en' || value === 'pt' ? value : 'system'),
+      setLanguageState(isLanguage(value) ? value : 'system'),
     )
   }, [])
 

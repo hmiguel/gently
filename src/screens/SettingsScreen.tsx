@@ -1,7 +1,7 @@
 import { Check, KeyRound } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { FormScreen, FormSection, OptionList } from '../components/FormScreen'
-import { LANGUAGE_NAMES, useI18n, type Language } from '../i18n'
+import { LANGUAGES, useI18n, type Language } from '../i18n'
 import { tap } from '../lib/haptics'
 import type { Permissions } from '../plugins/callguard'
 
@@ -86,8 +86,7 @@ export function SettingsScreen({
 
   const languageOptions: { value: Language; title: string; description: string }[] = [
     { value: 'system', title: t.systemLanguage, description: t.systemLanguageHint },
-    { value: 'en', title: LANGUAGE_NAMES.en, description: '' },
-    { value: 'pt', title: LANGUAGE_NAMES.pt, description: '' },
+    ...LANGUAGES.map(({ code, name }) => ({ value: code as Language, title: name, description: '' })),
   ]
 
   return (

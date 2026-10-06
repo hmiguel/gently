@@ -57,7 +57,7 @@ Available in English, Portuguese, Spanish, French and German. Requires Android 1
 
 - **Email:** hugo@lixo.dev (required, shown publicly)
 - **Website:** https://gently.lixo.dev
-- **Privacy policy URL:** https://gently.lixo.dev/privacy/ (was the gist until the site went live)
+- **Privacy policy URL:** https://gently.lixo.dev/privacy/
 
 ## Graphics
 

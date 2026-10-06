@@ -9,7 +9,8 @@ Android app that blocks outgoing and incoming calls, protected by an access code
 - **Access code:** 6 digits, stored as a salted PBKDF2 hash, with an escalating lockout after 5 wrong attempts.
   The app locks whenever it leaves the screen; the code can be changed in Settings (current code required)
 - **Log:** every blocked attempt, with time, number and direction
-- **Settings** (⚙): change the access code, see and re-grant permissions
+- **Settings** (⚙): turn the access code on/off (on by default; turning it off needs the code), change it,
+  choose the language (system, English, Português), see and re-grant permissions
 - **About** (ⓘ): how it works, what each permission is for, privacy, version
 - Emergency numbers are never blocked (Android enforces this)
 

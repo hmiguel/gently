@@ -2,15 +2,16 @@ import { App as CapApp } from '@capacitor/app'
 import { Info, Lock, Settings } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { TabBar, type Tab } from './components/TabBar'
+import { useI18n } from './i18n'
 import { tap } from './lib/haptics'
-import { hasPin } from './lib/pin'
+import { hasPin, isLockEnabled, setLockEnabled } from './lib/pin'
 import { CallGuard, type LogEntry, type Permissions, type Rule, type Rules, type Status } from './plugins/callguard'
 import { ContactPicker } from './plugins/contacts'
 import { LockScreen } from './screens/LockScreen'
 import { LogScreen } from './screens/LogScreen'
 import { AboutScreen } from './screens/AboutScreen'
 import { RuleForm } from './screens/RuleForm'
-import { SettingsScreen } from './screens/SettingsScreen'
+import { SettingsScreen, type SettingsNotice } from './screens/SettingsScreen'
 import { RulesScreen } from './screens/RulesScreen'
 import { StatusScreen } from './screens/StatusScreen'
 
@@ -19,12 +20,20 @@ type Phase = 'loading' | 'setup' | 'locked' | 'open'
 /** Full-screen pages layered over the tabs. A rule with `id: null` is a new one. */
 type Overlay =
   | { kind: 'rule'; id: string | null }
-  | { kind: 'settings'; notice?: string }
+  | { kind: 'settings'; notice?: SettingsNotice }
   | { kind: 'changeCode' }
+  | { kind: 'disableLock' }
   | { kind: 'about' }
 
 export default function App() {
+  const { m } = useI18n()
   const [phase, setPhase] = useState<Phase>('loading')
+  // Whether the access code is asked for. Mirrored in a ref for the background listener.
+  const [lockEnabled, setLockEnabledState] = useState(true)
+  const lockEnabledRef = useRef(lockEnabled)
+  useEffect(() => {
+    lockEnabledRef.current = lockEnabled
+  }, [lockEnabled])
   const [tab, setTab] = useState<Tab>('status')
   const [status, setStatus] = useState<Status | null>(null)
   const [log, setLog] = useState<LogEntry[]>([])
@@ -52,15 +61,29 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    hasPin().then((exists) => setPhase(exists ? 'locked' : 'setup'))
-  }, [])
+    Promise.all([hasPin(), isLockEnabled()]).then(([exists, enabled]) => {
+      setLockEnabledState(enabled)
+      if (!exists) setPhase('setup')
+      else if (enabled) setPhase('locked')
+      else {
+        setPhase('open')
+        refresh()
+      }
+    })
+  }, [refresh])
+
+  const changeLock = async (enabled: boolean) => {
+    await setLockEnabled(enabled)
+    setLockEnabledState(enabled)
+    setOverlay({ kind: 'settings', notice: enabled ? 'lockOn' : 'lockOff' })
+  }
 
   // Lock whenever the app leaves the foreground; refresh when it returns.
   useEffect(() => {
     const sub = CapApp.addListener('appStateChange', ({ isActive }) => {
       if (isActive) {
         refresh()
-      } else if (!expectingSystemDialog.current) {
+      } else if (lockEnabledRef.current && !expectingSystemDialog.current) {
         setPhase((p) => (p === 'open' ? 'locked' : p))
       }
     })
@@ -118,7 +141,7 @@ export default function App() {
           <div className="flex">
             <button
               type="button"
-              aria-label="Settings"
+              aria-label={m.common.settings}
               onClick={() => {
                 tap()
                 setOverlay({ kind: 'settings' })
@@ -129,7 +152,7 @@ export default function App() {
             </button>
             <button
               type="button"
-              aria-label="About Gently"
+              aria-label={m.common.about}
               onClick={() => {
                 tap()
                 setOverlay({ kind: 'about' })
@@ -138,17 +161,19 @@ export default function App() {
             >
               <Info strokeWidth={2.5} className="size-5" />
             </button>
-            <button
-              type="button"
-              aria-label="Lock app"
-              onClick={() => {
-                tap()
-                setPhase('locked')
-              }}
-              className="flex size-11 items-center justify-center transition-colors duration-150 ease-linear active:bg-ink active:text-paper"
-            >
-              <Lock strokeWidth={2.5} className="size-5" />
-            </button>
+            {lockEnabled && (
+              <button
+                type="button"
+                aria-label={m.common.lockApp}
+                onClick={() => {
+                  tap()
+                  setPhase('locked')
+                }}
+                className="flex size-11 items-center justify-center transition-colors duration-150 ease-linear active:bg-ink active:text-paper"
+              >
+                <Lock strokeWidth={2.5} className="size-5" />
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -191,7 +216,9 @@ export default function App() {
       {status && overlay?.kind === 'settings' && (
         <SettingsScreen
           permissions={status.permissions}
+          lockEnabled={lockEnabled}
           notice={overlay.notice}
+          onToggleLock={() => (lockEnabled ? setOverlay({ kind: 'disableLock' }) : changeLock(true))}
           onChangeCode={() => setOverlay({ kind: 'changeCode' })}
           onRequestPermission={requestPermission}
           onClose={() => setOverlay(null)}
@@ -203,8 +230,13 @@ export default function App() {
           <LockScreen
             mode="change"
             onCancel={() => setOverlay({ kind: 'settings' })}
-            onUnlock={() => setOverlay({ kind: 'settings', notice: 'Access code changed' })}
+            onUnlock={() => setOverlay({ kind: 'settings', notice: 'codeChanged' })}
           />
+        </div>
+      )}
+      {overlay?.kind === 'disableLock' && (
+        <div className="fixed inset-0 z-40 animate-sheet-in bg-paper">
+          <LockScreen mode="confirm" onCancel={() => setOverlay({ kind: 'settings' })} onUnlock={() => changeLock(false)} />
         </div>
       )}
       {rules && overlay?.kind === 'rule' && (

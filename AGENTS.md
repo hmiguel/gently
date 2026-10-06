@@ -8,6 +8,10 @@ Product overview and permissions are in [README.md](README.md).
 - `src/`: React + TypeScript + Tailwind v4 UI. Design tokens live only in `src/index.css`
   (Swiss style: paper/ink/muted/accent `#FF3000`, 0 radius, 4px rules, Inter)
 - `src/plugins/`: TypeScript contracts for the native plugins, with browser mocks for `npm run dev`
+- `src/i18n/`: **all UI text**. `en.ts` defines the shape, `pt.ts` (pt-PT) is typed against it, so a
+  missing translation fails the build. Components read it with `const { m } = useI18n()`. Rule
+  sentences (`m.rules.describe`) and dates use the selected language. Display headlines (`text-display`)
+  fit ~8 characters per word at 360px: keep translated titles short
 - `android/app/src/main/java/com/lixo/gently/callguard/`: native rule engine and call services
   - `RuleStore`: rules + log in SharedPreferences; precedence number/hidden > international > anyone, block wins ties
   - `International`: SIM-country vs E.164 calling code

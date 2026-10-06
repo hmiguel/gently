@@ -1,6 +1,7 @@
 import { Check, KeyRound } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { FormScreen, FormSection } from '../components/FormScreen'
+import { FormScreen, FormSection, OptionList } from '../components/FormScreen'
+import { LANGUAGE_NAMES, useI18n, type Language } from '../i18n'
 import { tap } from '../lib/haptics'
 import type { Permissions } from '../plugins/callguard'
 
@@ -10,11 +11,15 @@ function Row({
   description,
   trailing,
   onClick,
+  role,
+  checked,
 }: {
   title: string
   description: string
   trailing: ReactNode
   onClick?: () => void
+  role?: 'switch'
+  checked?: boolean
 }) {
   const body = (
     <>
@@ -31,6 +36,8 @@ function Row({
   return (
     <button
       type="button"
+      role={role}
+      aria-checked={role ? checked : undefined}
       onClick={() => {
         tap()
         onClick()
@@ -42,63 +49,95 @@ function Row({
   )
 }
 
-const PERMISSION_ROWS: { key: keyof Permissions; title: string; description: string }[] = [
-  { key: 'outgoing', title: 'Outgoing calls', description: 'Call redirection app' },
-  { key: 'incoming', title: 'Incoming calls', description: 'Caller ID & spam app, and contacts' },
-]
+/** Rectangular switch: the knob snaps, it doesn't glide. */
+function Switch({ on }: { on: boolean }) {
+  return (
+    <span aria-hidden className={`flex h-7 w-12 shrink-0 border-4 border-current p-0.5 ${on ? 'justify-end' : 'justify-start'}`}>
+      <span className={`size-3.5 ${on ? 'bg-accent' : 'bg-current'}`} />
+    </span>
+  )
+}
+
+export type SettingsNotice = 'codeChanged' | 'lockOn' | 'lockOff'
+
+const PERMISSION_KEYS: (keyof Permissions)[] = ['outgoing', 'incoming']
 
 export function SettingsScreen({
   permissions,
+  lockEnabled,
   notice,
+  onToggleLock,
   onChangeCode,
   onRequestPermission,
   onClose,
 }: {
   permissions: Permissions
-  /** One-off confirmation, e.g. after the code was changed. */
-  notice?: string
+  lockEnabled: boolean
+  /** One-off confirmation after a code change. */
+  notice?: SettingsNotice
+  /** Turning the lock off asks for the code first; the parent handles that. */
+  onToggleLock: () => void
   onChangeCode: () => void
   onRequestPermission: (direction: keyof Permissions) => void
   onClose: () => void
 }) {
+  const { m, language, setLanguage } = useI18n()
+  const t = m.settings
+
+  const languageOptions: { value: Language; title: string; description: string }[] = [
+    { value: 'system', title: t.systemLanguage, description: t.systemLanguageHint },
+    { value: 'en', title: LANGUAGE_NAMES.en, description: '' },
+    { value: 'pt', title: LANGUAGE_NAMES.pt, description: '' },
+  ]
+
   return (
-    <FormScreen index="00" label="Settings" title="Settings." onClose={onClose}>
-      <FormSection index="0.1" label="Access code">
+    <FormScreen index="00" label={t.label} title={t.title} onClose={onClose}>
+      <FormSection index="0.1" label={t.accessCode}>
         {notice && (
           <p className="text-label border-b-2 border-ink bg-muted px-6 py-3 text-accent-ink" role="status">
-            {notice}
+            {t.notices[notice]}
           </p>
         )}
         <Row
-          title="Change access code"
-          description="Needs your current code"
+          title={t.requireCode}
+          description={lockEnabled ? t.requireOn : t.requireOff}
+          role="switch"
+          checked={lockEnabled}
+          trailing={<Switch on={lockEnabled} />}
+          onClick={onToggleLock}
+        />
+        <Row
+          title={t.changeCode}
+          description={t.changeHint}
           trailing={<KeyRound strokeWidth={2.5} className="size-5 shrink-0" aria-hidden />}
           onClick={onChangeCode}
         />
       </FormSection>
 
-      <FormSection index="0.2" label="Permissions">
-        {PERMISSION_ROWS.map(({ key, title, description }) =>
+      <FormSection index="0.2" label={t.language}>
+        <OptionList label={t.language} options={languageOptions} value={language} onChange={setLanguage} />
+      </FormSection>
+
+      <FormSection index="0.3" label={t.permissions}>
+        {PERMISSION_KEYS.map((key) =>
           permissions[key] ? (
             <Row
               key={key}
-              title={title}
-              description={description}
+              title={t.permissionRows[key].title}
+              description={t.permissionRows[key].description}
               trailing={
                 <span className="text-label flex shrink-0 items-center gap-1.5">
-                  <Check strokeWidth={3} className="size-4" aria-hidden /> Granted
+                  <Check strokeWidth={3} className="size-4" aria-hidden /> {t.granted}
                 </span>
               }
             />
           ) : (
             <Row
               key={key}
-              title={title}
-              description={description}
+              title={t.permissionRows[key].title}
+              description={t.permissionRows[key].description}
               onClick={() => onRequestPermission(key)}
-              trailing={
-                <span className="text-label shrink-0 bg-accent px-3 py-2 text-paper">Grant</span>
-              }
+              trailing={<span className="text-label shrink-0 bg-accent px-3 py-2 text-paper">{t.grant}</span>}
             />
           ),
         )}

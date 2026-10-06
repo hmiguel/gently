@@ -1,5 +1,6 @@
 import { X } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { useI18n } from '../i18n'
 import { tap } from '../lib/haptics'
 import { SectionLabel } from './ui'
 
@@ -23,6 +24,7 @@ export function FormScreen({
   /** Pinned to the bottom; omit for read-only screens. */
   actions?: ReactNode
 }) {
+  const { m } = useI18n()
   return (
     <div
       role="dialog"
@@ -35,7 +37,7 @@ export function FormScreen({
           <SectionLabel index={index}>{label}</SectionLabel>
           <button
             type="button"
-            aria-label="Close"
+            aria-label={m.common.close}
             onClick={() => {
               tap()
               onClose()
@@ -107,9 +109,11 @@ export function OptionList<T extends string>({
           >
             <span>
               <span className="block text-base font-black uppercase tracking-tight">{option.title}</span>
-              <span className={`mt-0.5 block text-sm font-medium ${selected ? 'text-paper/70' : 'text-ink/60'}`}>
-                {option.description}
-              </span>
+              {option.description && (
+                <span className={`mt-0.5 block text-sm font-medium ${selected ? 'text-paper/70' : 'text-ink/60'}`}>
+                  {option.description}
+                </span>
+              )}
             </span>
             <span
               aria-hidden

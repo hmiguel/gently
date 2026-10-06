@@ -1,4 +1,5 @@
 import { Delete } from 'lucide-react'
+import { useI18n } from '../i18n'
 import { tap } from '../lib/haptics'
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'] as const
@@ -16,6 +17,7 @@ export function Keypad({
   onDelete: () => void
   disabled?: boolean
 }) {
+  const { m } = useI18n()
   return (
     <div className="grid grid-cols-3 gap-[2px] border-t-4 border-ink bg-ink">
       {KEYS.map((key, i) =>
@@ -26,7 +28,7 @@ export function Keypad({
             key={i}
             type="button"
             disabled={disabled}
-            aria-label={key === 'del' ? 'Delete digit' : key}
+            aria-label={key === 'del' ? m.lock.deleteDigit : key}
             onClick={() => {
               tap()
               if (key === 'del') onDelete()
@@ -44,8 +46,9 @@ export function Keypad({
 
 /** Row of square slots showing how many digits are entered. */
 export function PinSlots({ length, filled, error }: { length: number; filled: number; error?: boolean }) {
+  const { m } = useI18n()
   return (
-    <div className="flex gap-2" role="status" aria-label={`${filled} of ${length} digits entered`}>
+    <div className="flex gap-2" role="status" aria-label={m.lock.progress(filled, length)}>
       {Array.from({ length }, (_, i) => (
         <span
           key={i}

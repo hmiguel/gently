@@ -1,6 +1,7 @@
 import { App as CapApp } from '@capacitor/app'
 import { useEffect, useState, type ReactNode } from 'react'
 import { FormScreen, FormSection } from '../components/FormScreen'
+import { useI18n } from '../i18n'
 
 /** Numbered row: red index, bold title, plain explanation. */
 function Point({ index, title, children }: { index: string; title: string; children: ReactNode }) {
@@ -26,6 +27,8 @@ function Fact({ label, value }: { label: string; value: ReactNode }) {
 }
 
 export function AboutScreen({ onClose }: { onClose: () => void }) {
+  const { m } = useI18n()
+  const t = m.about
   const [version, setVersion] = useState('—')
 
   useEffect(() => {
@@ -37,7 +40,7 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
   return (
     <FormScreen
       index="00"
-      label="About"
+      label={t.label}
       title={
         <>
           Gently<span className="text-accent">.</span>
@@ -50,61 +53,54 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
         <div aria-hidden className="pointer-events-none absolute -right-10 top-0 size-28 rounded-full bg-accent" />
         <div aria-hidden className="pointer-events-none absolute right-8 top-16 h-3 w-24 bg-ink" />
         <p className="relative max-w-[62%] text-lg font-medium leading-snug">
-          Blocks the calls you choose, outgoing, incoming or both, behind an access code.
+          {t.tagline}
         </p>
       </div>
 
-      <FormSection index="0.1" label="How it works">
+      <FormSection index="0.1" label={t.howItWorks}>
         <ol>
-          <Point index="01" title="Rules">
-            Each rule blocks or allows calls to a number, to anyone, to international numbers, or from
-            hidden numbers.
-          </Point>
-          <Point index="02" title="Specific wins">
-            A rule for one number beats an international rule, which beats a rule for anyone. Block everyone
-            and allow a few to keep only those.
-          </Point>
-          <Point index="03" title="Access code">
-            Changing anything needs your code. The app locks every time it leaves the screen.
-          </Point>
+          {t.points.map((point, i) => (
+            <Point key={point.title} index={String(i + 1).padStart(2, '0')} title={point.title}>
+              {point.body}
+            </Point>
+          ))}
         </ol>
       </FormSection>
 
-      <FormSection index="0.2" label="Permissions">
+      <FormSection index="0.2" label={t.permissions}>
         <ol>
-          <Point index="01" title="Call redirection">Lets Gently stop outgoing calls before they connect.</Point>
-          <Point index="02" title="Caller ID & spam">Lets Gently reject incoming calls before your phone rings.</Point>
-          <Point index="03" title="Contacts">
-            Android only passes calls from saved contacts to apps that may read contacts. Gently never reads
-            your address book.
-          </Point>
+          {t.permissionPoints.map((point, i) => (
+            <Point key={point.title} index={String(i + 1).padStart(2, '0')} title={point.title}>
+              {point.body}
+            </Point>
+          ))}
         </ol>
       </FormSection>
 
       <section className="swiss-grid border-t-4 border-ink bg-muted px-6 py-8">
         <p className="text-label">
-          <span className="text-accent-ink">0.3.</span> Privacy
+          <span className="text-accent-ink">0.3.</span> {t.privacy}
         </p>
         <p className="mt-4 text-3xl font-black uppercase leading-[0.9] tracking-tighter">
-          Nothing leaves
+          {t.privacyTitle[0]}
           <br />
-          this phone.
+          {t.privacyTitle[1]}
         </p>
         <p className="mt-4 text-sm font-medium text-ink/70">
-          No account, no tracking, no internet access. Rules and the log are stored only on this device.
+          {t.privacyBody}
         </p>
       </section>
 
       <section className="border-t-4 border-ink bg-ink px-6 py-6 text-paper">
-        <p className="text-sm font-black uppercase tracking-[0.15em]">Emergency calls always work</p>
+        <p className="text-sm font-black uppercase tracking-[0.15em]">{t.emergencyTitle}</p>
         <p className="mt-2 text-sm font-medium text-paper/70">
-          Android never lets an app block emergency numbers, and Gently never tries.
+          {t.emergencyBody}
         </p>
       </section>
 
-      <FormSection index="0.4" label="Details">
-        <Fact label="Version" value={version} />
-        <Fact label="Requires" value="Android 10+" />
+      <FormSection index="0.4" label={t.details}>
+        <Fact label={t.version} value={version} />
+        <Fact label={t.requires} value="Android 10+" />
       </FormSection>
       <div className="border-t-4 border-ink" />
     </FormScreen>

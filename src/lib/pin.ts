@@ -8,6 +8,7 @@ export const PIN_LENGTH = 6
 
 const PIN_KEY = 'gently.pin'
 const ATTEMPTS_KEY = 'gently.pin.attempts'
+const LOCK_ENABLED_KEY = 'gently.pin.enabled'
 const ITERATIONS = 150_000
 const FREE_ATTEMPTS = 5
 const BASE_LOCKOUT_MS = 30_000
@@ -56,6 +57,16 @@ export async function setPin(pin: string) {
   const stored: StoredPin = { salt: toHex(salt), hash: await derive(pin, salt, ITERATIONS), iterations: ITERATIONS }
   await Preferences.set({ key: PIN_KEY, value: JSON.stringify(stored) })
   await Preferences.remove({ key: ATTEMPTS_KEY })
+}
+
+/** Whether the app asks for the code on open. On unless the user turned it off in Settings. */
+export async function isLockEnabled() {
+  const { value } = await Preferences.get({ key: LOCK_ENABLED_KEY })
+  return value !== 'false'
+}
+
+export async function setLockEnabled(enabled: boolean) {
+  await Preferences.set({ key: LOCK_ENABLED_KEY, value: String(enabled) })
 }
 
 export async function getLockedUntil() {

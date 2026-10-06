@@ -1,13 +1,12 @@
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button, ScreenHeader } from '../components/ui'
+import { useI18n } from '../i18n'
 import { labelFor } from '../lib/rules'
 import type { LogEntry, Rule } from '../plugins/callguard'
 
-const time = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' })
-
 /** "03:32" stays big; a 12-hour locale's "PM" becomes a small label so the column never wraps. */
-function formatTime(ts: number) {
+function formatTime(time: Intl.DateTimeFormat, ts: number) {
   const parts = time.formatToParts(ts)
   const period = parts.find((p) => p.type === 'dayPeriod')?.value
   const clock = parts
@@ -17,7 +16,6 @@ function formatTime(ts: number) {
     .trim()
   return { clock, period }
 }
-const day = new Intl.DateTimeFormat(undefined, { day: '2-digit', month: 'short' })
 
 /** Blocked attempts, laid out like a departures board. */
 export function LogScreen({
@@ -29,31 +27,34 @@ export function LogScreen({
   rules: Rule[]
   onClear: () => void
 }) {
+  const { m } = useI18n()
   const [confirming, setConfirming] = useState(false)
+  const time = useMemo(() => new Intl.DateTimeFormat(m.locale, { hour: '2-digit', minute: '2-digit' }), [m])
+  const day = useMemo(() => new Intl.DateTimeFormat(m.locale, { day: '2-digit', month: 'short' }), [m])
 
   return (
     <>
-      <ScreenHeader index="03" label="Log" title="Log." />
+      <ScreenHeader index="03" label={m.log.label} title={m.log.title} />
 
       {log.length === 0 ? (
         <section className="swiss-grid border-y-4 border-ink bg-muted px-6 py-16">
           <p className="text-4xl font-black uppercase leading-[0.9] tracking-tighter">
-            No calls
+            {m.log.empty[0]}
             <br />
-            blocked.
+            {m.log.empty[1]}
           </p>
-          <p className="mt-4 text-sm font-medium text-ink/60">Blocked attempts will appear here.</p>
+          <p className="mt-4 text-sm font-medium text-ink/60">{m.log.emptyBody}</p>
         </section>
       ) : (
         <>
           <div className="text-label grid grid-cols-[5.5rem_1fr] border-y-4 border-ink bg-muted px-6 py-3">
-            <span>When</span>
-            <span>Number</span>
+            <span>{m.log.when}</span>
+            <span>{m.log.number}</span>
           </div>
           <ol>
             {log.map((entry) => {
               const label = labelFor(rules, entry.number)
-              const { clock, period } = formatTime(entry.at)
+              const { clock, period } = formatTime(time, entry.at)
               const incoming = entry.direction === 'in'
               const Arrow = incoming ? ArrowDownLeft : ArrowUpRight
               return (
@@ -73,9 +74,9 @@ export function LogScreen({
                       <Arrow
                         strokeWidth={3}
                         className={`size-4 shrink-0 ${incoming ? 'text-accent-ink' : ''}`}
-                        aria-label={incoming ? 'Incoming' : 'Outgoing'}
+                        aria-label={incoming ? m.log.incoming : m.log.outgoing}
                       />
-                      <span className="truncate">{entry.number || 'Hidden number'}</span>
+                      <span className="truncate">{entry.number || m.log.hidden}</span>
                     </span>
                     {label && <span className="text-label block truncate text-accent-ink">{label}</span>}
                   </span>
@@ -92,7 +93,7 @@ export function LogScreen({
               }}
               onBlur={() => setConfirming(false)}
             >
-              {confirming ? 'Tap again to clear' : 'Clear log'}
+              {confirming ? m.log.confirmClear : m.log.clear}
               <span className="text-label">{String(log.length).padStart(2, '0')}</span>
             </Button>
           </section>

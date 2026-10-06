@@ -2,32 +2,22 @@ import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Keypad, PinSlots } from '../components/Keypad'
 import { SectionLabel } from '../components/ui'
+import { useI18n } from '../i18n'
 import { buzzError, tap, thud } from '../lib/haptics'
 import { getLockedUntil, PIN_LENGTH, setPin, verifyPin } from '../lib/pin'
 
-type Mode = 'setup' | 'unlock' | 'change'
+/**
+ * - setup:   first run, create + repeat
+ * - unlock:  open the app
+ * - change:  current code, then create + repeat
+ * - confirm: prove the code before turning it off
+ */
+type Mode = 'setup' | 'unlock' | 'change' | 'confirm'
 type Step = 'unlock' | 'create' | 'confirm'
 
-const TITLES: Record<Step, string> = {
-  unlock: 'Locked.',
-  create: 'Set code.',
-  confirm: 'Repeat.',
-}
-
-const HINTS: Record<Step, string> = {
-  unlock: 'Enter your access code',
-  create: `Choose a ${PIN_LENGTH}-digit code`,
-  confirm: 'Enter the same code again',
-}
-
-/** Changing the code: prove the current one first, then the usual set + repeat. */
-const CHANGE_TITLES: Partial<Record<Step, string>> = { unlock: 'Current.', create: 'New code.' }
-const CHANGE_HINTS: Partial<Record<Step, string>> = { unlock: 'Enter your current code' }
-
 /**
- * PIN entry for first-run setup, unlocking, and changing the code. In
- * "change" mode a wrong current code counts toward the same lockout, and
- * `onCancel` shows a close button.
+ * PIN entry for every code flow. Wrong codes in any mode count toward the same
+ * lockout, and `onCancel` shows a close button.
  */
 export function LockScreen({
   mode,
@@ -39,6 +29,7 @@ export function LockScreen({
   onUnlock: () => void
   onCancel?: () => void
 }) {
+  const { m } = useI18n()
   const [step, setStep] = useState<Step>(mode === 'setup' ? 'create' : 'unlock')
   const [digits, setDigits] = useState('')
   const [firstCode, setFirstCode] = useState('')
@@ -72,7 +63,7 @@ export function LockScreen({
           onUnlock()
           return
         }
-        fail('Codes did not match')
+        fail(m.lock.mismatch)
         setStep('create')
       } else {
         const result = await verifyPin(code)
@@ -87,7 +78,7 @@ export function LockScreen({
         }
         setNow(Date.now())
         setLockedUntil(result.lockedUntil)
-        fail('Wrong code')
+        fail(m.lock.wrong)
       }
     } finally {
       setDigits('')
@@ -109,8 +100,18 @@ export function LockScreen({
   }
 
   const secondsLeft = Math.ceil((lockedUntil - now) / 1000)
-  const title = (mode === 'change' && CHANGE_TITLES[step]) || TITLES[step]
-  const hint = (mode === 'change' && CHANGE_HINTS[step]) || HINTS[step]
+  const hints = { ...m.lock.hints, create: m.lock.hints.create(PIN_LENGTH) }
+  let title = m.lock.titles[step]
+  let hint = hints[step]
+  let section = m.lock.access
+  if (mode === 'change') {
+    section = m.lock.changeCode
+    if (step === 'unlock') [title, hint] = [m.lock.changeTitles.unlock, m.lock.changeHint]
+    if (step === 'create') title = m.lock.changeTitles.create
+  } else if (mode === 'confirm') {
+    section = m.lock.turnOff
+    ;[title, hint] = [m.lock.disableTitle, m.lock.disableHint]
+  }
 
   return (
     <div className="flex h-full flex-col">
@@ -124,7 +125,7 @@ export function LockScreen({
         {onCancel && (
           <button
             type="button"
-            aria-label="Cancel"
+            aria-label={m.common.cancel}
             onClick={() => {
               tap()
               onCancel()
@@ -136,12 +137,12 @@ export function LockScreen({
         )}
 
         <div className="relative mt-auto px-6 pb-8">
-          <SectionLabel index="00">{mode === 'change' ? 'Change code' : 'Access'}</SectionLabel>
+          <SectionLabel index="00">{section}</SectionLabel>
           <h1 className="text-display mt-4">{title}</h1>
           <div className="mt-8 flex flex-wrap items-end justify-between gap-4">
             <PinSlots length={PIN_LENGTH} filled={digits.length} error={!!error} />
             <p className={`text-label ${error || lockedOut ? 'text-accent-ink' : 'text-ink/60'}`} aria-live="polite">
-              {lockedOut ? `Wait ${secondsLeft}s` : (error ?? hint)}
+              {lockedOut ? m.lock.wait(secondsLeft) : (error ?? hint)}
             </p>
           </div>
         </div>

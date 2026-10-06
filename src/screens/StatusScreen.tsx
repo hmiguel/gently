@@ -1,20 +1,10 @@
 import { ArrowRight, ShieldAlert } from 'lucide-react'
 import { useState } from 'react'
 import { Button, ScreenHeader, Stat } from '../components/ui'
+import { useI18n } from '../i18n'
 import { requiredPermissions, type LogEntry, type Permissions, type Status } from '../plugins/callguard'
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000
-
-const PERMISSION_TEXT: Record<keyof Permissions, { title: string; body: string }> = {
-  outgoing: {
-    title: 'Outgoing: access required',
-    body: 'Allow Gently to screen outgoing calls. Choose Gently as the call redirection app.',
-  },
-  incoming: {
-    title: 'Incoming: access required',
-    body: 'Choose Gently as the caller ID & spam app, then allow Contacts (Android only lets Gently screen calls from saved contacts with it). If no prompt appears, Gently opens its settings: turn on Contacts under Permissions.',
-  },
-}
 
 function isToday(ts: number) {
   return new Date(ts).toDateString() === new Date().toDateString()
@@ -33,6 +23,7 @@ export function StatusScreen({
   onRequestPermission: (direction: keyof Permissions) => void
   onAddRule: () => void
 }) {
+  const { m } = useI18n()
   const [now] = useState(Date.now)
   const missing = requiredPermissions(status.rules).filter((p) => !status.permissions[p])
   const active = status.enabled && status.rules.length > 0 && missing.length === 0
@@ -50,12 +41,12 @@ export function StatusScreen({
         <div className="relative">
           <ScreenHeader
             index="01"
-            label="Status"
+            label={m.status.label}
             title={
               <>
-                Calls
+                {m.status.title(active)[0]}
                 <br />
-                {active ? 'blocked.' : 'open.'}
+                {m.status.title(active)[1]}
               </>
             }
           />
@@ -70,8 +61,8 @@ export function StatusScreen({
           <div className="flex items-start gap-4">
             <ShieldAlert strokeWidth={2.5} className="size-8 shrink-0" />
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.15em]">{PERMISSION_TEXT[permission].title}</p>
-              <p className="mt-2 text-sm font-medium">{PERMISSION_TEXT[permission].body}</p>
+              <p className="text-sm font-black uppercase tracking-[0.15em]">{m.status.permissions[permission].title}</p>
+              <p className="mt-2 text-sm font-medium">{m.status.permissions[permission].body}</p>
             </div>
           </div>
           <Button
@@ -79,7 +70,7 @@ export function StatusScreen({
             className="mt-6 active:border-paper! active:bg-paper! active:text-ink!"
             onClick={() => onRequestPermission(permission)}
           >
-            Grant access <ArrowRight strokeWidth={2.5} className="size-5" />
+            {m.status.grantAccess} <ArrowRight strokeWidth={2.5} className="size-5" />
           </Button>
         </section>
       ))}
@@ -87,14 +78,14 @@ export function StatusScreen({
       <section className="px-6 py-6">
         {status.rules.length === 0 ? (
           <>
-            <p className="mb-4 text-sm font-medium text-ink/70">Nothing to block yet. Start with your first rule.</p>
+            <p className="mb-4 text-sm font-medium text-ink/70">{m.status.empty}</p>
             <Button onClick={onAddRule}>
-              Create a rule <ArrowRight strokeWidth={2.5} className="size-5" />
+              {m.status.createRule} <ArrowRight strokeWidth={2.5} className="size-5" />
             </Button>
           </>
         ) : (
           <Button variant={status.enabled ? 'secondary' : 'primary'} onClick={onToggle}>
-            {status.enabled ? 'Turn blocking off' : 'Turn blocking on'}
+            {status.enabled ? m.status.turnOff : m.status.turnOn}
             <span className={`size-4 ${status.enabled ? 'bg-accent' : 'border-2 border-current'}`} aria-hidden />
           </Button>
         )}
@@ -102,13 +93,13 @@ export function StatusScreen({
 
       <section className="swiss-dots border-t-4 border-ink bg-muted">
         <div className="grid grid-cols-2 gap-[2px] bg-ink pb-[2px]">
-          <Stat label="Rules" value={String(status.rules.length).padStart(2, '0')} />
-          <Stat label="Today" value={String(log.filter((e) => isToday(e.at)).length).padStart(2, '0')} />
-          <Stat label="7 days" value={String(log.filter((e) => now - e.at < WEEK_MS).length).padStart(2, '0')} />
-          <Stat label="Total" value={String(log.length).padStart(2, '0')} />
+          <Stat label={m.status.stats.rules} value={String(status.rules.length).padStart(2, '0')} />
+          <Stat label={m.status.stats.today} value={String(log.filter((e) => isToday(e.at)).length).padStart(2, '0')} />
+          <Stat label={m.status.stats.week} value={String(log.filter((e) => now - e.at < WEEK_MS).length).padStart(2, '0')} />
+          <Stat label={m.status.stats.total} value={String(log.length).padStart(2, '0')} />
         </div>
         <p className="px-6 py-6 text-sm font-medium text-ink/70">
-          Emergency numbers are always allowed. Android never lets an app block them.
+          {m.status.emergency}
         </p>
       </section>
     </>

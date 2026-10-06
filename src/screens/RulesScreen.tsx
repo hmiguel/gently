@@ -1,7 +1,7 @@
 import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, ChevronRight, Plus } from 'lucide-react'
 import { Button, ScreenHeader } from '../components/ui'
+import { useI18n } from '../i18n'
 import { tap } from '../lib/haptics'
-import { describeRule, ruleSubject } from '../lib/rules'
 import type { Direction, Rule } from '../plugins/callguard'
 
 const DIRECTION_ICON: Record<Direction, typeof ArrowUpRight> = {
@@ -20,13 +20,14 @@ export function RulesScreen({
   onOpen: (id: string) => void
   onCreate: () => void
 }) {
+  const { m } = useI18n()
   return (
     <>
-      <ScreenHeader index="02" label="Rules" title="Rules." />
+      <ScreenHeader index="02" label={m.rules.label} title={m.rules.title} />
 
       <div className="px-6 pb-6">
         <Button onClick={onCreate}>
-          New rule <Plus strokeWidth={3} className="size-5" />
+          {m.rules.newRule} <Plus strokeWidth={3} className="size-5" />
         </Button>
       </div>
 
@@ -40,7 +41,7 @@ export function RulesScreen({
                 <li key={rule.id}>
                   <button
                     type="button"
-                    aria-label={describeRule(rule)}
+                    aria-label={m.rules.describe(rule)}
                     onClick={() => {
                       tap()
                       onOpen(rule.id)
@@ -57,12 +58,12 @@ export function RulesScreen({
                           aria-hidden
                           className={`size-2.5 ${blocks ? 'bg-accent' : 'border-2 border-current'}`}
                         />
-                        {blocks ? 'Block' : 'Allow'}
+                        {m.rules.action[rule.action]}
                         <Icon strokeWidth={3} className="ml-1 size-3.5" aria-hidden />
-                        {rule.direction}
+                        {m.rules.direction[rule.direction]}
                       </span>
                       <span className="mt-1 block truncate text-xl font-black uppercase leading-tight tracking-tight">
-                        {ruleSubject(rule)}
+                        {m.rules.subject(rule)}
                       </span>
                       {rule.target === 'number' && rule.label && (
                         <span className="block truncate text-sm font-medium tabular-nums opacity-60">
@@ -77,18 +78,18 @@ export function RulesScreen({
             })}
           </ul>
           <p className="px-6 py-6 text-sm font-medium text-ink/60">
-            When rules overlap, a rule for a specific number wins over a rule for anyone.
+            {m.rules.overlap}
           </p>
         </>
       ) : (
         <section className="swiss-grid border-y-4 border-ink bg-muted px-6 py-12">
           <p className="text-3xl font-black uppercase leading-[0.9] tracking-tighter">
-            No rules
+            {m.rules.empty[0]}
             <br />
-            yet.
+            {m.rules.empty[1]}
           </p>
           <p className="mt-3 text-sm font-medium text-ink/60">
-            Create one to block a number, block everyone, or allow only a few.
+            {m.rules.emptyBody}
           </p>
         </section>
       )}

@@ -2,22 +2,24 @@ import { BookUser } from 'lucide-react'
 import { useState } from 'react'
 import { FormScreen, FormSection, OptionList } from '../components/FormScreen'
 import { Button } from '../components/ui'
-import {
-  ACTION_OPTIONS,
-  describeRule,
-  digitsOf,
-  DIRECTION_OPTIONS,
-  newRuleId,
-  sameNumber,
-  targetOptions,
-} from '../lib/rules'
-import type { Rule } from '../plugins/callguard'
+import { useI18n } from '../i18n'
+import { countryName, digitsOf, newRuleId, sameNumber } from '../lib/rules'
+import type { Action, Direction, Rule, Target } from '../plugins/callguard'
 import type { PickedContact } from '../plugins/contacts'
 
 const inputClass =
   'mt-1 block w-full rounded-none border-0 border-ink bg-transparent py-2 placeholder:text-ink/25 focus:border-accent focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
 
 const BLANK: Omit<Rule, 'id'> = { action: 'block', direction: 'outgoing', target: 'number' }
+
+/** Option order is fixed here; titles and descriptions come from the dictionary. */
+const ACTIONS: Action[] = ['block', 'allow']
+const DIRECTIONS: Direction[] = ['outgoing', 'incoming', 'both']
+const TARGETS: Target[] = ['number', 'anyone', 'international', 'hidden']
+
+function options<T extends string>(values: T[], text: Record<T, { title: string; description: string }>) {
+  return values.map((value) => ({ value, ...text[value] }))
+}
 
 /**
  * Creates a rule (no `rule`) or edits/deletes an existing one. Everything a
@@ -42,6 +44,8 @@ export function RuleForm({
   onPickContact: () => Promise<PickedContact | null>
   onClose: () => void
 }) {
+  const { m } = useI18n()
+  const t = m.ruleForm
   const [draft, setDraft] = useState<Omit<Rule, 'id'>>(rule ?? BLANK)
   const [error, setError] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -56,7 +60,7 @@ export function RuleForm({
     if (final.target === 'hidden') final.direction = 'incoming'
     if (final.target === 'number') {
       const number = final.number?.trim() ?? ''
-      if (digitsOf(number).length < 3) return setError('Enter a valid number')
+      if (digitsOf(number).length < 3) return setError(t.errors.invalid)
       final.number = number
       final.label = final.label?.trim() || undefined
     } else {
@@ -69,7 +73,7 @@ export function RuleForm({
         o.direction === final.direction &&
         (final.target !== 'number' || sameNumber(o.number ?? '', final.number ?? '')),
     )
-    if (duplicate) return setError('A rule like this already exists')
+    if (duplicate) return setError(t.errors.duplicate)
     onSave(final)
   }
 
@@ -78,15 +82,15 @@ export function RuleForm({
       const contact = await onPickContact()
       if (contact) update({ number: contact.number, label: contact.name ?? draft.label })
     } catch {
-      setError('Could not open contacts')
+      setError(t.errors.contacts)
     }
   }
 
   return (
     <FormScreen
       index="02"
-      label={rule ? 'Edit rule' : 'New rule'}
-      title={describeRule(draft.target === 'hidden' ? { ...draft, direction: 'incoming' } : draft)}
+      label={rule ? t.editRule : t.newRule}
+      title={m.rules.describe(draft.target === 'hidden' ? { ...draft, direction: 'incoming' } : draft)}
       onClose={onClose}
       actions={
         <>
@@ -96,7 +100,7 @@ export function RuleForm({
             </p>
           )}
           <Button onClick={save}>
-            {rule ? 'Save changes' : 'Create rule'} <span className="size-4 bg-accent" aria-hidden />
+            {rule ? t.save : t.create} <span className="size-4 bg-accent" aria-hidden />
           </Button>
           {onDelete && (
             <Button
@@ -104,39 +108,49 @@ export function RuleForm({
               onClick={() => (confirmDelete ? onDelete() : setConfirmDelete(true))}
               onBlur={() => setConfirmDelete(false)}
             >
-              {confirmDelete ? 'Tap again to delete' : 'Delete rule'}
+              {confirmDelete ? t.confirmDelete : t.delete}
             </Button>
           )}
         </>
       }
     >
-      <FormSection index="2.1" label="Action">
-        <OptionList label="Action" options={ACTION_OPTIONS} value={draft.action} onChange={(action) => update({ action })} />
+      <FormSection index="2.1" label={t.sections.action}>
+        <OptionList
+          label={t.sections.action}
+          options={options(ACTIONS, t.actions)}
+          value={draft.action}
+          onChange={(action) => update({ action })}
+        />
       </FormSection>
 
-      <FormSection index="2.2" label="Calls">
+      <FormSection index="2.2" label={t.sections.calls}>
         {draft.target === 'hidden' ? (
           <p className="px-6 py-4 text-sm font-medium text-ink/60">
-            Hidden numbers only exist on incoming calls, so this rule applies to incoming calls.
+            {t.hiddenNote}
           </p>
         ) : (
           <OptionList
-            label="Calls"
-            options={DIRECTION_OPTIONS}
+            label={t.sections.calls}
+            options={options(DIRECTIONS, t.directions)}
             value={draft.direction}
             onChange={(direction) => update({ direction })}
           />
         )}
       </FormSection>
-      <FormSection index="2.3" label="Who">
-        <OptionList label="Who" options={targetOptions(homeCountry)} value={draft.target} onChange={(target) => update({ target })} />
+      <FormSection index="2.3" label={t.sections.who}>
+        <OptionList
+          label={t.sections.who}
+          options={options(TARGETS, t.targets(countryName(homeCountry, m.locale, t.yourCountry)))}
+          value={draft.target}
+          onChange={(target) => update({ target })}
+        />
         {draft.target === 'number' && (
           <div className="swiss-diagonal space-y-6 border-t-2 border-ink bg-muted px-6 py-6">
             <Button variant="secondary" onClick={pick}>
-              Choose from contacts <BookUser strokeWidth={2.5} className="size-5" />
+              {t.fromContacts} <BookUser strokeWidth={2.5} className="size-5" />
             </Button>
             <label className="block">
-              <span className="text-label text-ink/60">Phone number</span>
+              <span className="text-label text-ink/60">{t.phone}</span>
               <input
                 type="tel"
                 inputMode="tel"
@@ -148,13 +162,13 @@ export function RuleForm({
               />
             </label>
             <label className="block">
-              <span className="text-label text-ink/60">Name (optional)</span>
+              <span className="text-label text-ink/60">{t.name}</span>
               <input
                 type="text"
                 autoComplete="off"
                 value={draft.label ?? ''}
                 onChange={(e) => update({ label: e.target.value })}
-                placeholder="Who is it?"
+                placeholder={t.namePlaceholder}
                 className={`${inputClass} border-b-2 text-lg font-medium`}
               />
             </label>

@@ -8,6 +8,8 @@ import type { Block } from './i18n/en'
 
 /** Kept in English in every language, by choice. */
 export const MADE_IN = 'Made in Europe'
+/** Credit, in English on every language like MADE_IN. */
+export const BUILT_WITH = { label: 'Built with Claude Code', url: 'https://claude.com/claude-code' }
 export const SOURCE_URL = 'https://github.com/hmiguel/gently'
 export const SPONSOR_URL = 'https://github.com/sponsors/hmiguel'
 export const LICENSE_URL = 'https://www.gnu.org/licenses/gpl-3.0.html'

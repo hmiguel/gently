@@ -124,3 +124,5 @@ useful, but WITHOUT ANY WARRANTY; see the license for details.
 
 The Inter typeface is licensed under the SIL Open Font License 1.1.
 
+Built with [Claude Code](https://claude.com/claude-code).
+

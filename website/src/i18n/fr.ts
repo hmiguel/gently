@@ -5,7 +5,7 @@ export const fr: Site = {
   meta: {
     homeTitle: "Gently : bloqueur d'appels pour Android",
     homeDescription:
-      "Bloquez les appels sortants, entrants ou internationaux avec des règles simples, protégées par un code. Sans pub, sans compte, sans accès à internet.",
+      'Bloquez les appels sortants, entrants ou internationaux avec des règles simples. Sans pub, sans compte, sans accès à internet.',
     privacyTitle: 'Politique de confidentialité · Gently',
     privacyDescription: "Gently garde vos règles et le journal des appels bloqués uniquement sur votre téléphone. Rien n'est collecté ni partagé.",
     supportTitle: 'Aide · Gently',
@@ -17,6 +17,7 @@ export const fr: Site = {
     note: 'En test fermé sur Google Play · Android 10+',
   },
   home: {
+    tagline: 'Bloquez les appels de votre choix : sortants, entrants ou internationaux, avec des règles simples.',
     title: ['Appels', 'bloqués.'],
     features: 'Ce que fait Gently',
     extras: [

@@ -5,7 +5,7 @@ export const pt: Site = {
   meta: {
     homeTitle: 'Gently: bloqueador de chamadas para Android',
     homeDescription:
-      'Bloqueie chamadas efetuadas, recebidas ou internacionais com regras simples, protegidas por um código. Sem anúncios, sem conta, sem acesso à internet.',
+      'Bloqueie chamadas efetuadas, recebidas ou internacionais com regras simples. Sem anúncios, sem conta, sem acesso à internet.',
     privacyTitle: 'Política de privacidade · Gently',
     privacyDescription: 'O Gently guarda as suas regras e o registo de chamadas bloqueadas só no telemóvel. Nada é recolhido nem partilhado.',
     supportTitle: 'Ajuda · Gently',
@@ -17,6 +17,7 @@ export const pt: Site = {
     note: 'Em teste fechado na Google Play · Android 10+',
   },
   home: {
+    tagline: 'Bloqueie as chamadas que escolher: efetuadas, recebidas ou internacionais, com regras simples.',
     title: ['Bloqueio', 'ativo.'],
     features: 'O que faz',
     extras: [

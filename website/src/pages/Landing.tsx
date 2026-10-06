@@ -33,7 +33,7 @@ export function Landing({ lang }: { lang: Lang }) {
               <br />
               {s.home.title[1]}
             </h1>
-            <p className="mt-8 max-w-xl text-xl font-medium leading-snug">{app.about.tagline}</p>
+            <p className="mt-8 max-w-xl text-xl font-medium leading-snug">{s.home.tagline}</p>
             <div className="mt-10">
               <JoinButton lang={lang} />
               <p className="text-label mt-4 text-ink/60">{s.cta.note}</p>

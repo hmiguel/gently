@@ -15,7 +15,7 @@ export const en = {
   meta: {
     homeTitle: 'Gently: call blocker for Android',
     homeDescription:
-      'Block outgoing, incoming or international calls with simple rules, protected by an access code. No ads, no account, no internet access.',
+      'Block outgoing, incoming or international calls with simple rules. No ads, no account, no internet access.',
     privacyTitle: 'Privacy policy · Gently',
     privacyDescription: 'Gently stores your rules and blocked-call log only on your phone. Nothing is collected or shared.',
     supportTitle: 'Support · Gently',
@@ -27,6 +27,7 @@ export const en = {
     note: 'In closed testing on Google Play · Android 10+',
   },
   home: {
+    tagline: 'Block the calls you choose: outgoing, incoming or international, with simple rules.',
     title: ['Calls', 'blocked.'],
     features: 'What it does',
     extras: [

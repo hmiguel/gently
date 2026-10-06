@@ -5,7 +5,7 @@ export const de: Site = {
   meta: {
     homeTitle: 'Gently: Anrufsperre für Android',
     homeDescription:
-      'Sperre ausgehende, eingehende oder internationale Anrufe mit einfachen Regeln, geschützt durch einen Code. Keine Werbung, kein Konto, kein Internetzugriff.',
+      'Sperr ausgehende, eingehende oder internationale Anrufe mit einfachen Regeln. Keine Werbung, kein Konto, kein Internetzugriff.',
     privacyTitle: 'Datenschutzerklärung · Gently',
     privacyDescription: 'Gently speichert deine Regeln und den Verlauf gesperrter Anrufe nur auf deinem Handy. Nichts wird erfasst oder geteilt.',
     supportTitle: 'Hilfe · Gently',
@@ -17,6 +17,7 @@ export const de: Site = {
     note: 'Im geschlossenen Test bei Google Play · Android 10+',
   },
   home: {
+    tagline: 'Sperr die Anrufe, die du willst: ausgehend, eingehend oder international, mit einfachen Regeln.',
     title: ['Sperre', 'aktiv.'],
     features: 'Was es kann',
     extras: [

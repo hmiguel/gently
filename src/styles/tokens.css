@@ -1,0 +1,70 @@
+/*
+ * Shared by the app (src/index.css) and the website (website/src/site.css).
+ * Import after "tailwindcss".
+ */
+
+/*
+ * Swiss International design tokens — the single source of truth.
+ * Palette is strict: paper, ink, muted, accent. Nothing else.
+ */
+@theme {
+  --font-sans: "Inter Variable", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  --color-paper: #ffffff;
+  --color-ink: #000000;
+  --color-muted: #f2f2f2;
+  --color-accent: #ff3000;
+  /* Swiss red darkened just enough to pass WCAG AA (4.6:1) for small text. */
+  --color-accent-ink: #e02a00;
+
+  --radius-*: initial;
+
+  --ease-mech: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Forms slide up as one rigid plane: no fade, no bounce. */
+  --animate-sheet-in: sheet-in 200ms var(--ease-mech);
+
+  @keyframes sheet-in {
+    from {
+      transform: translateY(100%);
+    }
+  }
+}
+
+/* Textures: depth through pattern, never shadow. Not for ink or accent fills. */
+@utility swiss-grid {
+  background-image:
+    linear-gradient(to right, rgb(0 0 0 / 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(0 0 0 / 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+@utility swiss-dots {
+  background-image: radial-gradient(rgb(0 0 0 / 0.04) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+@utility swiss-diagonal {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgb(0 0 0 / 0.02) 0 1px,
+    transparent 1px 10px
+  );
+}
+
+/* Massive headline: fills the phone width without overflowing ~8 characters. */
+@utility text-display {
+  hyphens: auto;
+  font-size: clamp(3.25rem, 16vw, 8rem);
+  line-height: 0.85;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+}
+
+/* Small structural label: uppercase, widely tracked. */
+@utility text-label {
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}

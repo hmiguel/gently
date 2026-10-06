@@ -87,6 +87,11 @@ Xiaomi/HyperOS also needs **Install via USB** enabled in Developer options.
 - `npm run assets` renders the legacy launcher PNGs and the Play Store files in `resources/store/`
   (`icon-512.png`, `feature-graphic.png`) using your installed Chrome
 
+## Website
+
+`website/` builds **gently.lixo.dev** (landing, privacy policy, support; 5 languages):
+`npm run site:build && npm run site:preview`. Details in [AGENTS.md](AGENTS.md#website).
+
 ## Releases
 
 `npm version patch && git push --follow-tags` publishes a signed APK as a GitHub Release and, once

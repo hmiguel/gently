@@ -1,6 +1,8 @@
 # Gently: Privacy Policy
 
-<!-- Published at https://gist.github.com/hmiguel/71b7c9a76dec40cfcf0e282566d070cc — update the gist when this changes (gh gist edit 71b7c9a76dec40cfcf0e282566d070cc). -->
+<!-- The policy of record is now the website: https://gently.lixo.dev/privacy/ (source:
+website/src/i18n/*.ts, privacy section). This English copy is kept for reference; the old gist
+https://gist.github.com/hmiguel/71b7c9a76dec40cfcf0e282566d070cc points to the website. -->
 
 _Last updated: 5 October 2026_
 

@@ -1,0 +1,42 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "../../src/styles/tokens.css";
+
+/* Only scan the website for classes, not the app. */
+@source not "../../src";
+@source "../src";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+  }
+
+  ::selection {
+    @apply bg-accent text-paper;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-paper;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    ::before,
+    ::after {
+      transition-duration: 0ms !important;
+      animation-duration: 0ms !important;
+    }
+  }
+}
+
+/* Website headlines can grow beyond the phone cap: 16vw up to 9rem on wide screens. */
+@utility text-display {
+  font-size: clamp(3.25rem, 13vw, 9rem);
+}

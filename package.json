@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "assets": "node scripts/render-assets.mjs",
     "release": "npm run build && cap sync android && cd android && ./gradlew bundleRelease assembleRelease",
-    "screenshots": "node scripts/render-screenshots.mjs"
+    "screenshots": "node scripts/render-screenshots.mjs",
+    "site:build": "vite build -c website/vite.config.ts && vite build -c website/vite.config.ts --ssr src/render.tsx --outDir .ssr && node website/prerender.mjs",
+    "site:preview": "vite preview -c website/vite.config.ts --port 4173"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.2",

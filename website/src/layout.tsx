@@ -1,0 +1,175 @@
+import type { ReactNode } from 'react'
+import { CONTACT, LANGS, pathFor, SITE_URL, texts, TEST_URL, type Lang, type Page } from './i18n'
+import type { Block } from './i18n/en'
+
+/** "01. Rules": numbered section label, as in the app. */
+export function SectionLabel({ index, children }: { index: string; children: ReactNode }) {
+  return (
+    <p className="text-label">
+      <span className="text-accent-ink">{index}.</span> {children}
+    </p>
+  )
+}
+
+/** Paragraphs and bullet lists from a Block[] (see website/src/i18n/en.ts). */
+export function Blocks({ blocks, className = '' }: { blocks: Block[]; className?: string }) {
+  return (
+    <div className={`space-y-4 ${className}`}>
+      {blocks.map((block, i) =>
+        typeof block === 'string' ? (
+          <p key={i}>{block}</p>
+        ) : (
+          <ul key={i} className="space-y-2">
+            {block.map((item) => (
+              <li key={item} className="flex gap-3">
+                <span aria-hidden className="mt-[0.45em] size-2 shrink-0 bg-accent" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        ),
+      )}
+    </div>
+  )
+}
+
+/** Primary call to action: black block with the red signal square, inverts to red on hover. */
+export function JoinButton({ lang }: { lang: Lang }) {
+  const { s } = texts(lang)
+  return (
+    <a
+      href={TEST_URL}
+      className="group inline-flex h-16 w-full items-center justify-between gap-6 border-4 border-ink bg-ink px-6 text-sm font-bold uppercase tracking-[0.15em] text-paper transition-colors duration-150 ease-linear hover:border-accent hover:bg-accent sm:w-auto"
+    >
+      {s.cta.join}
+      <span aria-hidden className="size-4 bg-accent group-hover:bg-paper" />
+    </a>
+  )
+}
+
+/** The Gently mark: red signal circle crossed by a black bar. */
+export function Mark({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="24 24 60 60" aria-hidden className={className}>
+      <circle cx="59" cy="54" r="24" fill="#FF3000" />
+      <rect x="26" y="60.5" width="44" height="8" fill="#000" />
+    </svg>
+  )
+}
+
+function Header({ lang, page }: { lang: Lang; page: Page }) {
+  const { s } = texts(lang)
+  const link = 'text-label px-2 py-3 hover:text-accent-ink'
+  return (
+    <header className="border-b-4 border-ink">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-4">
+        <a href={pathFor(lang, 'home')} className="flex items-center gap-3 text-xl font-black uppercase tracking-tighter">
+          <Mark className="size-7" />
+          <span>
+            Gently<span className="text-accent">.</span>
+          </span>
+        </a>
+        <nav className="flex flex-wrap items-center gap-x-2" aria-label="Gently">
+          <a href={pathFor(lang, 'privacy')} className={link} aria-current={page === 'privacy' ? 'page' : undefined}>
+            {s.nav.privacy}
+          </a>
+          <a href={pathFor(lang, 'support')} className={link} aria-current={page === 'support' ? 'page' : undefined}>
+            {s.nav.support}
+          </a>
+        </nav>
+      </div>
+      {/* Language switcher: plain links, so it works without JS; site.js remembers the choice. */}
+      <nav aria-label={s.nav.language} className="border-t-2 border-ink">
+        <ul className="mx-auto flex max-w-6xl flex-wrap px-4">
+          {LANGS.map((l) => (
+            <li key={l.code}>
+              <a
+                href={pathFor(l.code, page)}
+                hrefLang={l.locale}
+                lang={l.locale}
+                data-lang={l.code}
+                aria-current={l.code === lang ? 'true' : undefined}
+                className={`text-label block px-2 py-2 ${l.code === lang ? 'bg-ink text-paper' : 'hover:text-accent-ink'}`}
+              >
+                {l.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </header>
+  )
+}
+
+/** Build year for the footer (pages are rendered once, at build time). */
+const YEAR = new Date().getFullYear()
+
+function Footer({ lang }: { lang: Lang }) {
+  const { s } = texts(lang)
+  return (
+    <footer className="border-t-4 border-ink">
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-8 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-label">
+          Gently<span className="text-accent">.</span> · {s.footer.made} · {YEAR}
+        </p>
+        <p className="flex flex-wrap gap-x-4 gap-y-2">
+          <a className="text-label hover:text-accent-ink" href={pathFor(lang, 'privacy')}>
+            {s.nav.privacy}
+          </a>
+          <a className="text-label hover:text-accent-ink" href={pathFor(lang, 'support')}>
+            {s.nav.support}
+          </a>
+          <a className="text-label hover:text-accent-ink" href={`mailto:${CONTACT}`}>
+            {CONTACT}
+          </a>
+        </p>
+      </div>
+    </footer>
+  )
+}
+
+const TITLES: Record<Page, (t: ReturnType<typeof texts>['s']) => [string, string]> = {
+  home: (t) => [t.meta.homeTitle, t.meta.homeDescription],
+  privacy: (t) => [t.meta.privacyTitle, t.meta.privacyDescription],
+  support: (t) => [t.meta.supportTitle, t.meta.supportDescription],
+}
+
+/** Full HTML document for one page. `css` is the built stylesheet's URL. */
+export function Document({ lang, page, css, children }: { lang: Lang; page: Page; css: string; children: ReactNode }) {
+  const { s } = texts(lang)
+  const [title, description] = TITLES[page](s)
+  const locale = LANGS.find((l) => l.code === lang)!.locale
+  const url = SITE_URL + pathFor(lang, page)
+  return (
+    <html lang={locale}>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <meta name="theme-color" content="#ffffff" />
+        <link rel="canonical" href={url} />
+        {LANGS.map((l) => (
+          <link key={l.code} rel="alternate" hrefLang={l.locale} href={SITE_URL + pathFor(l.code, page)} />
+        ))}
+        <link rel="alternate" hrefLang="x-default" href={SITE_URL + pathFor('en', page)} />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={url} />
+        <meta property="og:image" content={`${SITE_URL}/og.png`} />
+        <meta property="og:locale" content={locale.replace('-', '_')} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="stylesheet" href={css} />
+        {/* Remembers language choices; on "/" redirects first-time visitors to their language. */}
+        <script src="/site.js" />
+      </head>
+      <body>
+        <Header lang={lang} page={page} />
+        <main>{children}</main>
+        <Footer lang={lang} />
+      </body>
+    </html>
+  )
+}

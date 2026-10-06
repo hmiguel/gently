@@ -56,8 +56,8 @@ Available in English, Portuguese, Spanish, French and German. Requires Android 1
 ## Contact details
 
 - **Email:** hugo@lixo.dev (required, shown publicly)
-- **Website:** optional
-- **Privacy policy URL:** https://gist.github.com/hmiguel/71b7c9a76dec40cfcf0e282566d070cc
+- **Website:** https://gently.lixo.dev
+- **Privacy policy URL:** https://gently.lixo.dev/privacy/ (was the gist until the site went live)
 
 ## Graphics
 
@@ -65,7 +65,7 @@ Available in English, Portuguese, Spanish, French and German. Requires Android 1
 |---|---|
 | App icon 512×512 | `resources/store/icon-512.png` |
 | Feature graphic 1024×500 | `resources/store/feature-graphic.png` |
-| Phone screenshots (1080×2400) | `resources/store/screenshots/*.png` |
+| Phone screenshots (1080×1920) | `resources/store/screenshots/<lang>/*.png` (en, pt, es, fr, de) |
 
 ---
 

@@ -18,7 +18,13 @@ Product overview and permissions are in [README.md](README.md).
   - `International`: SIM-country vs E.164 calling code
   - `GentlyRedirectionService` (outgoing), `GentlyScreeningService` (incoming)
   - `CallGuardPlugin`, `ContactPickerPlugin`: Capacitor bridges
-- `resources/`: icon masters (SVG) and Play Store assets; `docs/`: privacy policy, store listing
+- `resources/`: icon masters (SVG) and Play Store assets, screenshots per language in
+  `resources/store/screenshots/<lang>/`; `docs/`: store listing, closed-test post
+- `website/`: **gently.lixo.dev**, a static site prerendered with React + Tailwind (no client framework).
+  Pages Landing / Privacy / Support × 5 languages. Site text in `website/src/i18n/` (typed like the
+  app's); wording shared with the app is imported from `src/i18n/` so the two never disagree. Shared
+  design tokens live in `src/styles/tokens.css` (imported by the app and the site). The privacy page
+  is the privacy policy of record
 
 ## Everyday commands
 
@@ -33,6 +39,18 @@ cd android && ./gradlew :app:connectedDebugAndroidTest     # device tests, no ca
 ```
 
 Always use `:app:` task paths: the Capacitor sub-modules' own test tasks fail and aren't ours.
+
+## Website
+
+```sh
+npm run site:build     # client CSS → SSR renderer → website/prerender.mjs → website/dist (15 pages + 404,
+                       # sitemap, robots, _headers with a same-origin-only CSP)
+npm run site:preview   # serve website/dist on http://localhost:4173
+```
+
+Deployed by Cloudflare Pages from this repo (build `npm ci && npm run site:build`, output
+`website/dist`). Screenshots come from `resources/store/screenshots/<lang>/`; regenerate them with
+`npm run screenshots` (needs `npx vite --port 5199`) after UI changes.
 
 ## Releasing
 

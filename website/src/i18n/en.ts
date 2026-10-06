@@ -138,7 +138,7 @@ export const en = {
     contactTitle: 'Still stuck?',
     contactBody: 'Write to us and include your phone model and Android version.',
   },
-  footer: { source: 'Source code', openSource: 'Open source (GPL-3.0)', made: 'Made in Europe' },
+  footer: { source: 'Source code', openSource: 'Open source (GPL-3.0)' },
   notFound: { title: 'Not found.', body: 'This page does not exist.', home: 'Go to the home page' },
 }
 

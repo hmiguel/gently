@@ -1,5 +1,5 @@
 import { Fragment, type CSSProperties, type ReactNode } from 'react'
-import { markdownPath, SOURCE_URL, structuredData, titleAndDescription } from './content'
+import { MADE_IN, markdownPath, SOURCE_URL, structuredData, titleAndDescription } from './content'
 import { CONTACT, LANGS, pathFor, SITE_URL, texts, TEST_URL, type Lang, type Page } from './i18n'
 import type { Block } from './i18n/en'
 
@@ -128,7 +128,7 @@ function Footer({ lang }: { lang: Lang }) {
     <footer className="border-t-4 border-ink">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-8 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-label">
-          Gently<span className="text-accent">.</span> · {s.footer.made} · {YEAR}
+          Gently<span className="text-accent">.</span> · {MADE_IN} · {YEAR}
         </p>
         <p className="flex flex-wrap gap-x-4 gap-y-2">
           <a className="text-label hover:text-accent-ink" href={pathFor(lang, 'privacy')}>

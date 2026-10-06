@@ -6,6 +6,8 @@
 import { CONTACT, LANGS, pathFor, PAGES, SITE_URL, texts, TEST_URL, type Lang, type Page } from './i18n'
 import type { Block } from './i18n/en'
 
+/** Kept in English in every language, by choice. */
+export const MADE_IN = 'Made in Europe'
 export const SOURCE_URL = 'https://github.com/hmiguel/gently'
 export const LICENSE_URL = 'https://www.gnu.org/licenses/gpl-3.0.html'
 export const SCREENS = ['02-status', '03-rules', '04-rule-form', '05-log']
@@ -77,7 +79,7 @@ export function renderMarkdown(lang: Lang, page: Page) {
 
   return (
     head +
-    `# Gently\n\n> ${s.home.tagline}\n\n**${s.home.promise}** ${s.footer.made}.\n\n${s.cta.note}. ${s.cta.join}: ${TEST_URL}\n\n` +
+    `# Gently\n\n> ${s.home.tagline}\n\n**${s.home.promise}** ${MADE_IN}.\n\n${s.cta.note}. ${s.cta.join}: ${TEST_URL}\n\n` +
     `## ${s.home.features}\n\n` +
     features(lang)
       .map((f) => `### ${f.title}\n\n${f.body}`)

@@ -131,6 +131,6 @@ export const es: Site = {
     contactTitle: '¿Sigues con dudas?',
     contactBody: 'Escríbenos e indica el modelo de tu móvil y la versión de Android.',
   },
-  footer: { source: 'Código fuente', openSource: 'Código abierto (GPL-3.0)', made: 'Hecho en Europa' },
+  footer: { source: 'Código fuente', openSource: 'Código abierto (GPL-3.0)' },
   notFound: { title: 'No existe.', body: 'Esta página no existe.', home: 'Ir a la página de inicio' },
 }

@@ -131,6 +131,6 @@ export const fr: Site = {
     contactTitle: 'Toujours bloqué ?',
     contactBody: 'Écrivez-nous en indiquant le modèle de votre téléphone et la version d’Android.',
   },
-  footer: { source: 'Code source', openSource: 'Open source (GPL-3.0)', made: 'Créé en Europe' },
+  footer: { source: 'Code source', openSource: 'Open source (GPL-3.0)' },
   notFound: { title: 'Introuvable.', body: "Cette page n'existe pas.", home: "Aller à la page d'accueil" },
 }

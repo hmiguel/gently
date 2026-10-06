@@ -1,6 +1,11 @@
 # Gently
 
-Android app that blocks outgoing and incoming calls, protected by an access code.
+Block the calls you choose on Android: outgoing, incoming or international, with simple rules.
+No ads, no account, no internet access.
+
+**Website:** [gently.lixo.dev](https://gently.lixo.dev) ·
+**Google Play:** [closed test](https://play.google.com/apps/testing/com.lixo.gently) ·
+**License:** [GPL-3.0-or-later](LICENSE)
 
 - **Rules:** each rule says *block* or *allow*, *outgoing / incoming / both*, and *who*: one number
   (picked from contacts or typed), anyone, international numbers (outside the SIM's country), or hidden
@@ -28,7 +33,8 @@ There is **no `INTERNET` permission**: rules and the log never leave the device.
 ## Stack
 
 - UI: React + TypeScript + Tailwind CSS v4, packaged with [Capacitor](https://capacitorjs.com)
-- Design: Swiss International style. All tokens live in `src/index.css`
+- Design: Swiss International style. Tokens live in `src/styles/tokens.css` (shared with the website)
+- UI text: `src/i18n/` (English, Português, Español, Français, Deutsch)
 - Native: `android/app/src/main/java/com/lixo/gently/callguard/`
   - `GentlyRedirectionService` uses Android's `CallRedirectionService` (Android 10+) to cancel matching calls from any dialer
   - `GentlyScreeningService` uses `CallScreeningService` to reject matching incoming calls before they ring
@@ -96,3 +102,24 @@ Xiaomi/HyperOS also needs **Install via USB** enabled in Developer options.
 
 `npm version patch && git push --follow-tags` publishes a signed APK as a GitHub Release and, once
 connected, uploads the AAB to Google Play. Details, keys and secrets: [AGENTS.md](AGENTS.md#releasing).
+
+## Contributing
+
+Issues and pull requests are welcome. Before opening a PR, run `npm run build && npm run lint`, and for
+native changes build the app (`cd android && ./gradlew :app:assembleDebug`). New UI text goes into
+`src/i18n/en.ts` and every other language file (the build fails if one is missing). Coding agents:
+start with [AGENTS.md](AGENTS.md).
+
+Security issues: please email hugo@lixo.dev instead of opening a public issue.
+
+## License
+
+Copyright © 2026 Hugo Conceicao.
+
+Gently is free software: you can redistribute it and/or modify it under the terms of the
+[GNU General Public License](LICENSE) as published by the Free Software Foundation, either version 3
+of the License, or (at your option) any later version. It is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; see the license for details.
+
+The Inter typeface is licensed under the SIL Open Font License 1.1.
+

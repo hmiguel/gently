@@ -1,6 +1,5 @@
 {
   "name": "gently",
-  "private": true,
   "version": "1.1.0",
   "type": "module",
   "scripts": {
@@ -37,5 +36,7 @@
     "puppeteer-core": "^23.11.1",
     "typescript": "~6.0.2",
     "vite": "^8.3.0"
-  }
+  },
+  "license": "GPL-3.0-or-later",
+  "private": true
 }

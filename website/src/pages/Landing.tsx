@@ -1,17 +1,20 @@
+import { features, SCREEN_WIDTHS, SCREENS } from '../content'
 import { Blocks, JoinButton, SectionLabel } from '../layout'
 import { pathFor, texts, type Lang } from '../i18n'
 
-const SCREENS = ['02-status', '03-rules', '04-rule-form', '05-log']
-
-/** A phone screenshot with a hard 4px frame, as on the Play listing. */
-function Screen({ lang, name, alt, eager = false }: { lang: Lang; name: string; alt: string; eager?: boolean }) {
+/** A phone screenshot with a hard 4px frame; the browser picks the smallest WebP that fits. */
+function Screen({ lang, name, alt, sizes, hero = false }: { lang: Lang; name: string; alt: string; sizes: string; hero?: boolean }) {
+  const src = (w: number) => `/img/${lang}/${name}-${w}.webp`
   return (
     <img
-      src={`/img/${lang}/${name}.png`}
+      src={src(540)}
+      srcSet={SCREEN_WIDTHS.map((w) => `${src(w)} ${w}w`).join(', ')}
+      sizes={sizes}
       alt={alt}
       width={1080}
       height={1920}
-      loading={eager ? 'eager' : 'lazy'}
+      loading={hero ? 'eager' : 'lazy'}
+      fetchPriority={hero ? 'high' : undefined}
       decoding="async"
       className="block h-auto w-full border-4 border-ink bg-paper"
     />
@@ -20,7 +23,6 @@ function Screen({ lang, name, alt, eager = false }: { lang: Lang; name: string; 
 
 export function Landing({ lang }: { lang: Lang }) {
   const { s, app } = texts(lang)
-  const features = [...app.about.points, ...s.home.extras.map((e) => ({ title: e.title, body: e.body }))]
 
   return (
     <>
@@ -46,7 +48,7 @@ export function Landing({ lang }: { lang: Lang }) {
             />
             <div aria-hidden className="absolute -right-8 bottom-24 h-5 w-2/3 bg-ink" />
             <div className="relative">
-              <Screen lang={lang} name="02-status" alt={s.home.screenAlts[0]} eager />
+              <Screen lang={lang} name="02-status" alt={s.home.screenAlts[0]} sizes="(min-width: 1024px) 384px, 320px" hero />
             </div>
           </div>
         </div>
@@ -58,7 +60,7 @@ export function Landing({ lang }: { lang: Lang }) {
         </div>
         <div className="mx-auto max-w-6xl px-6 pb-16">
           <ul className="grid gap-[2px] border-4 border-ink bg-ink sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((f, i) => (
+            {features(lang).map((f, i) => (
               <li key={f.title} className="bg-paper p-6 transition-colors duration-200 ease-out hover:bg-muted">
                 <p className="text-label text-accent-ink">{String(i + 1).padStart(2, '0')}</p>
                 <h2 className="mt-3 text-2xl font-black uppercase leading-none tracking-tighter">{f.title}</h2>
@@ -74,7 +76,7 @@ export function Landing({ lang }: { lang: Lang }) {
           <SectionLabel index="02">{s.home.screens}</SectionLabel>
           <div className="mt-8 grid grid-cols-2 gap-6 lg:grid-cols-4">
             {SCREENS.map((name, i) => (
-              <Screen key={name} lang={lang} name={name} alt={s.home.screenAlts[i]} />
+              <Screen key={name} lang={lang} name={name} alt={s.home.screenAlts[i]} sizes="(min-width: 1024px) 270px, 45vw" />
             ))}
           </div>
         </div>

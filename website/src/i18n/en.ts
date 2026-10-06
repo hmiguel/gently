@@ -16,12 +16,12 @@ export const en = {
     homeTitle: 'Gently: call blocker for Android',
     homeDescription:
       'Block outgoing, incoming or international calls with simple rules. No ads, no account, no internet access.',
-    privacyTitle: 'Privacy policy · Gently',
+    privacyTitle: 'Privacy policy · Gently call blocker',
     privacyDescription: 'Gently stores your rules and blocked-call log only on your phone. Nothing is collected or shared.',
-    supportTitle: 'Support · Gently',
+    supportTitle: 'Help & FAQ · Gently call blocker',
     supportDescription: 'Setting up Gently, permissions, spam protection, international rules and more.',
   },
-  nav: { privacy: 'Privacy', support: 'Support', language: 'Language' },
+  nav: { skip: 'Skip to content', privacy: 'Privacy', support: 'Support', language: 'Language' },
   cta: {
     join: 'Join the test',
     note: 'In closed testing on Google Play · Android 10+',
@@ -137,7 +137,7 @@ export const en = {
     contactTitle: 'Still stuck?',
     contactBody: 'Write to us and include your phone model and Android version.',
   },
-  footer: { made: 'Made by lixo.dev' },
+  footer: { source: 'Source code', openSource: 'Open source (GPL-3.0)', made: 'Made by lixo.dev' },
   notFound: { title: 'Not found.', body: 'This page does not exist.', home: 'Go to the home page' },
 }
 

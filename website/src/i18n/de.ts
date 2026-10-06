@@ -6,12 +6,12 @@ export const de: Site = {
     homeTitle: 'Gently: Anrufsperre für Android',
     homeDescription:
       'Sperr ausgehende, eingehende oder internationale Anrufe mit einfachen Regeln. Keine Werbung, kein Konto, kein Internetzugriff.',
-    privacyTitle: 'Datenschutzerklärung · Gently',
+    privacyTitle: 'Datenschutzerklärung · Gently Anrufsperre',
     privacyDescription: 'Gently speichert deine Regeln und den Verlauf gesperrter Anrufe nur auf deinem Handy. Nichts wird erfasst oder geteilt.',
-    supportTitle: 'Hilfe · Gently',
+    supportTitle: 'Hilfe & FAQ · Gently Anrufsperre',
     supportDescription: 'Gently einrichten, Berechtigungen, Spamschutz, internationale Regeln und mehr.',
   },
-  nav: { privacy: 'Datenschutz', support: 'Hilfe', language: 'Sprache' },
+  nav: { skip: 'Zum Inhalt springen', privacy: 'Datenschutz', support: 'Hilfe', language: 'Sprache' },
   cta: {
     join: 'Am Test teilnehmen',
     note: 'Im geschlossenen Test bei Google Play · Android 10+',
@@ -130,6 +130,6 @@ export const de: Site = {
     contactTitle: 'Noch Fragen?',
     contactBody: 'Schreib uns und nenn dein Handymodell und deine Android-Version.',
   },
-  footer: { made: 'Gemacht von lixo.dev' },
+  footer: { source: 'Quellcode', openSource: 'Open Source (GPL-3.0)', made: 'Gemacht von lixo.dev' },
   notFound: { title: 'Nicht da.', body: 'Diese Seite gibt es nicht.', home: 'Zur Startseite' },
 }

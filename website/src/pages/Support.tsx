@@ -1,17 +1,9 @@
+import { faq } from '../content'
 import { Blocks } from '../layout'
 import { CONTACT, texts, type Lang } from '../i18n'
-import type { Block } from '../i18n/en'
 
 export function Support({ lang }: { lang: Lang }) {
-  const { s, app } = texts(lang)
-
-  /** Some answers are completed with the app's own wording, so site and app never disagree. */
-  const answer = (id: string, a: Block[]): Block[] => {
-    if (id === 'permissions') return [...a, app.about.permissionPoints.map((p) => `${p.title}: ${p.body}`)]
-    if (id === 'spam') return [...a, app.settings.restoreSpam.steps]
-    if (id === 'emergency') return [...a, app.about.emergencyBody]
-    return a
-  }
+  const { s } = texts(lang)
 
   return (
     <article>
@@ -24,7 +16,7 @@ export function Support({ lang }: { lang: Lang }) {
 
       {/* Native <details>: opens without JavaScript; the plus turns into a cross. */}
       <div className="border-t-4 border-ink">
-        {s.support.faq.map((item, i) => (
+        {faq(lang).map((item, i) => (
           <details key={item.id} id={item.id} className="group border-b-2 border-ink">
             <summary className="mx-auto flex max-w-6xl cursor-pointer list-none items-start gap-6 px-6 py-6 transition-colors duration-150 ease-linear hover:text-accent-ink [&::-webkit-details-marker]:hidden">
               <span className="text-label w-6 shrink-0 pt-2 text-accent-ink tabular-nums">
@@ -39,7 +31,7 @@ export function Support({ lang }: { lang: Lang }) {
               </span>
             </summary>
             <div className="mx-auto max-w-6xl px-6 pb-8 pl-[4.5rem]">
-              <Blocks blocks={answer(item.id, item.a)} className="max-w-3xl text-lg font-medium leading-relaxed text-ink/80" />
+              <Blocks blocks={item.a} className="max-w-3xl text-lg font-medium leading-relaxed text-ink/80" />
             </div>
           </details>
         ))}

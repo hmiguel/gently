@@ -6,12 +6,12 @@ export const es: Site = {
     homeTitle: 'Gently: bloqueador de llamadas para Android',
     homeDescription:
       'Bloquea llamadas salientes, entrantes o internacionales con reglas sencillas. Sin anuncios, sin cuenta, sin acceso a internet.',
-    privacyTitle: 'Política de privacidad · Gently',
+    privacyTitle: 'Política de privacidad · Gently, bloqueador de llamadas',
     privacyDescription: 'Gently guarda tus reglas y el registro de llamadas bloqueadas solo en tu móvil. No se recoge ni se comparte nada.',
-    supportTitle: 'Ayuda · Gently',
+    supportTitle: 'Ayuda y FAQ · Gently, bloqueador de llamadas',
     supportDescription: 'Configurar Gently, permisos, protección contra spam, reglas internacionales y más.',
   },
-  nav: { privacy: 'Privacidad', support: 'Ayuda', language: 'Idioma' },
+  nav: { skip: 'Saltar al contenido', privacy: 'Privacidad', support: 'Ayuda', language: 'Idioma' },
   cta: {
     join: 'Únete a la prueba',
     note: 'En prueba cerrada en Google Play · Android 10+',
@@ -130,6 +130,6 @@ export const es: Site = {
     contactTitle: '¿Sigues con dudas?',
     contactBody: 'Escríbenos e indica el modelo de tu móvil y la versión de Android.',
   },
-  footer: { made: 'Hecho por lixo.dev' },
+  footer: { source: 'Código fuente', openSource: 'Código abierto (GPL-3.0)', made: 'Hecho por lixo.dev' },
   notFound: { title: 'No existe.', body: 'Esta página no existe.', home: 'Ir a la página de inicio' },
 }

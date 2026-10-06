@@ -48,6 +48,12 @@ npm run site:build     # client CSS → SSR renderer → website/prerender.mjs �
 npm run site:preview   # serve website/dist on http://localhost:4173
 ```
 
+SEO and AI-agent readiness, all generated from the same dictionaries (`website/src/content.ts`):
+schema.org JSON-LD per page (MobileApplication, FAQPage on support, breadcrumbs), hreflang, OG/Twitter
+tags, sitemap with lastmod, a Markdown twin of every page (`<page>/index.md`, linked via
+`rel="alternate" type="text/markdown"`), `/llms.txt` + `/llms-full.txt`, and a robots.txt that
+explicitly welcomes AI crawlers. Screenshots ship as responsive WebP (360/540/720/1080, via `sharp`).
+
 Deployed by Cloudflare Pages from this repo (build `npm ci && npm run site:build`, output
 `website/dist`). Screenshots come from `resources/store/screenshots/<lang>/`; regenerate them with
 `npm run screenshots` (needs `npx vite --port 5199`) after UI changes.

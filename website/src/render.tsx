@@ -2,7 +2,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { pathFor, texts, type Lang, type Page } from './i18n'
 import { renderLlmsFull, renderLlmsTxt, renderMarkdown } from './content'
-import { Document, type Build } from './layout'
+import { Display, Document, type Build } from './layout'
 import { Landing } from './pages/Landing'
 import { Privacy } from './pages/Privacy'
 import { Support } from './pages/Support'
@@ -40,7 +40,7 @@ export function renderNotFound(build: Build) {
       <Document lang="en" page="home" build={build} noindex>
         <section className="swiss-grid">
           <div className="mx-auto max-w-6xl px-6 py-24">
-            <h1 className="text-display">{s.notFound.title}</h1>
+            <Display lines={[s.notFound.title]} />
             <p className="mt-6 text-xl font-medium">{s.notFound.body}</p>
             <a href={pathFor('en', 'home')} className="text-label mt-8 inline-block border-b-2 border-accent pb-1">
               {s.notFound.home} →

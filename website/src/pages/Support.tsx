@@ -1,5 +1,5 @@
 import { faq } from '../content'
-import { Blocks } from '../layout'
+import { Blocks, Display } from '../layout'
 import { CONTACT, texts, type Lang } from '../i18n'
 
 export function Support({ lang }: { lang: Lang }) {
@@ -9,7 +9,7 @@ export function Support({ lang }: { lang: Lang }) {
     <article>
       <header className="swiss-grid">
         <div className="mx-auto max-w-6xl px-6 py-16">
-          <h1 className="text-display">{s.support.title}</h1>
+          <Display lines={[s.support.title]} />
           <p className="mt-8 max-w-2xl text-xl font-medium">{s.support.intro}</p>
         </div>
       </header>

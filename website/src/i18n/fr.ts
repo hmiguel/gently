@@ -17,6 +17,7 @@ export const fr: Site = {
     note: 'En test fermé sur Google Play · Android 10+',
   },
   home: {
+    promise: 'Gratuit et sans pub. Pour toujours.',
     tagline: 'Bloquez les appels de votre choix : sortants, entrants ou internationaux, avec des règles simples.',
     title: ['Appels', 'bloqués.'],
     features: 'Ce que fait Gently',
@@ -32,7 +33,7 @@ export const fr: Site = {
     supportLink: "Lire la page d'aide",
   },
   privacy: {
-    title: 'Confidentialité.',
+    title: 'Vie privée.',
     updated: 'Mise à jour le',
     date: '5 octobre 2026',
     summary: "Gently ne collecte, ne stocke à distance, ne partage ni ne vend aucune donnée personnelle. Tout reste sur votre téléphone.",
@@ -130,6 +131,6 @@ export const fr: Site = {
     contactTitle: 'Toujours bloqué ?',
     contactBody: 'Écrivez-nous en indiquant le modèle de votre téléphone et la version d’Android.',
   },
-  footer: { source: 'Code source', openSource: 'Open source (GPL-3.0)', made: 'Créé par lixo.dev' },
+  footer: { source: 'Code source', openSource: 'Open source (GPL-3.0)', made: 'Créé en Europe par hmiguel' },
   notFound: { title: 'Introuvable.', body: "Cette page n'existe pas.", home: "Aller à la page d'accueil" },
 }

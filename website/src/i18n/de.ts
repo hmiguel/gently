@@ -17,6 +17,7 @@ export const de: Site = {
     note: 'Im geschlossenen Test bei Google Play · Android 10+',
   },
   home: {
+    promise: 'Kostenlos und werbefrei. Für immer.',
     tagline: 'Sperr die Anrufe, die du willst: ausgehend, eingehend oder international, mit einfachen Regeln.',
     title: ['Sperre', 'aktiv.'],
     features: 'Was es kann',
@@ -130,6 +131,6 @@ export const de: Site = {
     contactTitle: 'Noch Fragen?',
     contactBody: 'Schreib uns und nenn dein Handymodell und deine Android-Version.',
   },
-  footer: { source: 'Quellcode', openSource: 'Open Source (GPL-3.0)', made: 'Gemacht von lixo.dev' },
+  footer: { source: 'Quellcode', openSource: 'Open Source (GPL-3.0)', made: 'In Europa gemacht von hmiguel' },
   notFound: { title: 'Nicht da.', body: 'Diese Seite gibt es nicht.', home: 'Zur Startseite' },
 }

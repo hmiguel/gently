@@ -77,7 +77,7 @@ export function renderMarkdown(lang: Lang, page: Page) {
 
   return (
     head +
-    `# Gently\n\n> ${s.home.tagline}\n\n${s.cta.note}. ${s.cta.join}: ${TEST_URL}\n\n` +
+    `# Gently\n\n> ${s.home.tagline}\n\n**${s.home.promise}** ${s.footer.made}.\n\n${s.cta.note}. ${s.cta.join}: ${TEST_URL}\n\n` +
     `## ${s.home.features}\n\n` +
     features(lang)
       .map((f) => `### ${f.title}\n\n${f.body}`)
@@ -98,12 +98,13 @@ export function renderLlmsTxt() {
 Key facts:
 
 - Platform: Android 10 or newer. There is no iOS version: iOS does not let apps block outgoing calls.
-- Price: free. Status: closed testing on Google Play (${TEST_URL}).
+- Price: free and ad-free, forever. Status: closed testing on Google Play (${TEST_URL}).
+- Made in Europe.
 - Rules: block or allow; outgoing, incoming or both; one number, anyone, international numbers (outside the SIM's country) or hidden numbers. The most specific rule wins: number or hidden, then international, then anyone.
 - Uses Android's call redirection and call screening roles. Holding the "Caller ID & spam" role pauses the phone's own spam protection (e.g. Google Phone) while Gently holds it.
 - Emergency numbers are never blocked.
 - Languages: ${LANGS.map((l) => l.name).join(', ')}.
-- Developer: lixo.dev, contact ${CONTACT}. Source code: ${SOURCE_URL} (GPL-3.0-or-later).
+- Developer: hmiguel (https://github.com/hmiguel), contact ${CONTACT}. Source code: ${SOURCE_URL} (GPL-3.0-or-later).
 
 ## Docs
 
@@ -137,21 +138,21 @@ export function structuredData(lang: Lang, page: Page, dateModified: string) {
   const locale = LANGS.find((l) => l.code === lang)!.locale
   const [title, description] = titleAndDescription(lang, page)
   const pageUrl = url(lang, page)
-  const org = { '@type': 'Organization', '@id': `${SITE_URL}/#org`, name: 'lixo.dev', url: 'https://lixo.dev', email: CONTACT }
+  const author = { '@type': 'Person', '@id': `${SITE_URL}/#author`, name: 'hmiguel', url: 'https://github.com/hmiguel', email: CONTACT }
   const website = {
     '@type': 'WebSite',
     '@id': `${SITE_URL}/#website`,
     url: `${SITE_URL}/`,
     name: 'Gently',
     inLanguage: LANGS.map((l) => l.locale),
-    publisher: { '@id': org['@id'] },
+    publisher: { '@id': author['@id'] },
   }
   const app = {
     '@type': 'MobileApplication',
     '@id': `${SITE_URL}/#app`,
     name: 'Gently',
     alternateName: s.meta.homeTitle,
-    description: s.home.tagline,
+    description: `${s.home.tagline} ${s.home.promise}`,
     url: url(lang, 'home'),
     installUrl: TEST_URL,
     operatingSystem: 'Android 10+',
@@ -163,8 +164,8 @@ export function structuredData(lang: Lang, page: Page, dateModified: string) {
     featureList: features(lang).map((f) => `${f.title}: ${f.body}`),
     screenshot: SCREENS.map((n) => `${SITE_URL}/img/${lang}/${n}-1080.webp`),
     image: `${SITE_URL}/icon-512.png`,
-    author: { '@id': org['@id'] },
-    publisher: { '@id': org['@id'] },
+    author: { '@id': author['@id'] },
+    publisher: { '@id': author['@id'] },
     license: LICENSE_URL,
     codeRepository: SOURCE_URL,
   }
@@ -195,5 +196,5 @@ export function structuredData(lang: Lang, page: Page, dateModified: string) {
       acceptedAnswer: { '@type': 'Answer', text: blocksToText(item.a) },
     }))
   }
-  return { '@context': 'https://schema.org', '@graph': [org, website, app, webpage] }
+  return { '@context': 'https://schema.org', '@graph': [author, website, app, webpage] }
 }

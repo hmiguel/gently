@@ -1,4 +1,4 @@
-import { Blocks, SectionLabel } from '../layout'
+import { Blocks, Display, SectionLabel } from '../layout'
 import { CONTACT, texts, type Lang } from '../i18n'
 
 export function Privacy({ lang }: { lang: Lang }) {
@@ -8,7 +8,7 @@ export function Privacy({ lang }: { lang: Lang }) {
     <article>
       <header className="swiss-grid">
         <div className="mx-auto max-w-6xl px-6 py-16">
-          <h1 className="text-display">{p.title}</h1>
+          <Display lines={[p.title]} />
           <p className="text-label mt-6 text-ink/60">
             {p.updated} {p.date}
           </p>

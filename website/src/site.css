@@ -36,7 +36,16 @@
   }
 }
 
-/* Website headlines can grow beyond the phone cap: 16vw up to 9rem on wide screens. */
-@utility text-display {
-  font-size: clamp(3.25rem, 13vw, 9rem);
+/*
+ * Website headline: sized from the width it actually has (container units) and its longest
+ * word (--chars, set by <Display>), so a word never breaks or overflows in any language.
+ * 0.7em is a safe average width for Inter Black uppercase with tight tracking.
+ */
+@utility text-display-fit {
+  font-size: min(9rem, calc(100cqi / (var(--chars) * 0.7)));
+  line-height: 0.85;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  hyphens: manual;
 }

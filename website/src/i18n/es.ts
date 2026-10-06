@@ -17,6 +17,7 @@ export const es: Site = {
     note: 'En prueba cerrada en Google Play · Android 10+',
   },
   home: {
+    promise: 'Gratis y sin anuncios. Para siempre.',
     tagline: 'Bloquea las llamadas que elijas: salientes, entrantes o internacionales, con reglas sencillas.',
     title: ['Bloqueo', 'activo.'],
     features: 'Qué hace',
@@ -130,6 +131,6 @@ export const es: Site = {
     contactTitle: '¿Sigues con dudas?',
     contactBody: 'Escríbenos e indica el modelo de tu móvil y la versión de Android.',
   },
-  footer: { source: 'Código fuente', openSource: 'Código abierto (GPL-3.0)', made: 'Hecho por lixo.dev' },
+  footer: { source: 'Código fuente', openSource: 'Código abierto (GPL-3.0)', made: 'Hecho en Europa por hmiguel' },
   notFound: { title: 'No existe.', body: 'Esta página no existe.', home: 'Ir a la página de inicio' },
 }

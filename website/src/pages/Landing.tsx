@@ -1,5 +1,5 @@
 import { features, SCREEN_WIDTHS, SCREENS } from '../content'
-import { Blocks, JoinButton, SectionLabel } from '../layout'
+import { Blocks, Display, JoinButton, SectionLabel } from '../layout'
 import { pathFor, texts, type Lang } from '../i18n'
 
 /** A phone screenshot with a hard 4px frame; the browser picks the smallest WebP that fits. */
@@ -30,12 +30,13 @@ export function Landing({ lang }: { lang: Lang }) {
       <section className="swiss-grid overflow-hidden">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-16 lg:grid-cols-[7fr_5fr] lg:py-24">
           <div>
-            <h1 className="text-display">
-              {s.home.title[0]}
-              <br />
-              {s.home.title[1]}
-            </h1>
+            <Display lines={s.home.title} />
             <p className="mt-8 max-w-xl text-xl font-medium leading-snug">{s.home.tagline}</p>
+            {/* The promise, set as a hard tag with the red signal square. */}
+            <p className="text-label mt-6 inline-flex items-center gap-3 bg-ink px-4 py-3 text-paper">
+              <span aria-hidden className="size-3 shrink-0 bg-accent" />
+              {s.home.promise}
+            </p>
             <div className="mt-10">
               <JoinButton lang={lang} />
               <p className="text-label mt-4 text-ink/60">{s.cta.note}</p>

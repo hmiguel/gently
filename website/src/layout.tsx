@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { Fragment, type CSSProperties, type ReactNode } from 'react'
 import { markdownPath, SOURCE_URL, structuredData, titleAndDescription } from './content'
 import { CONTACT, LANGS, pathFor, SITE_URL, texts, TEST_URL, type Lang, type Page } from './i18n'
 import type { Block } from './i18n/en'
@@ -9,6 +9,23 @@ export function SectionLabel({ index, children }: { index: string; children: Rea
     <p className="text-label">
       <span className="text-accent-ink">{index}.</span> {children}
     </p>
+  )
+}
+
+/** Page headline, one entry per line. Never hyphenates: the size adapts to the longest word. */
+export function Display({ lines }: { lines: string[] }) {
+  const chars = Math.max(...lines.flatMap((line) => line.split(/\s+/)).map((word) => word.length))
+  return (
+    <div className="@container">
+      <h1 className="text-display-fit" style={{ '--chars': chars } as CSSProperties}>
+        {lines.map((line, i) => (
+          <Fragment key={i}>
+            {i > 0 && <br />}
+            {line}
+          </Fragment>
+        ))}
+      </h1>
+    </div>
   )
 }
 

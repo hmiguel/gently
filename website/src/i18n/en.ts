@@ -21,7 +21,7 @@ export const en = {
     supportTitle: 'Help & FAQ · Gently call blocker',
     supportDescription: 'Setting up Gently, permissions, spam protection, international rules and more.',
   },
-  nav: { skip: 'Skip to content', privacy: 'Privacy', support: 'Support', language: 'Language' },
+  nav: { skip: 'Skip to content', privacy: 'Privacy', support: 'Help', language: 'Language' },
   cta: {
     join: 'Join the test',
     note: 'In closed testing on Google Play · Android 10+',
@@ -40,7 +40,7 @@ export const en = {
     screenAlts: ['Status screen with blocking on', 'List of rules', 'Editing a rule', 'Log of blocked calls'],
     supportTitle: 'Questions?',
     supportBody: 'Permissions, spam protection, international numbers and more, explained.',
-    supportLink: 'Read the support page',
+    supportLink: 'Read the help page',
   },
   privacy: {
     title: 'Privacy.',
@@ -84,7 +84,7 @@ export const en = {
     contact: 'Questions about this policy:',
   },
   support: {
-    title: 'Support.',
+    title: 'Help.',
     intro: 'Answers to the common questions. Anything else: write to us.',
     faq: [
       {

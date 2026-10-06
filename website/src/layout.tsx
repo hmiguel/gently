@@ -1,6 +1,6 @@
 import { Fragment, type CSSProperties, type ReactNode } from 'react'
 import { MADE_IN, markdownPath, SOURCE_URL, structuredData, titleAndDescription } from './content'
-import { CONTACT, LANGS, pathFor, SITE_URL, texts, TEST_URL, type Lang, type Page } from './i18n'
+import { LANGS, pathFor, SITE_URL, texts, TEST_URL, type Lang, type Page } from './i18n'
 import type { Block } from './i18n/en'
 
 /** "01. Rules": numbered section label, as in the app. */
@@ -139,9 +139,6 @@ function Footer({ lang }: { lang: Lang }) {
           </a>
           <a className="text-label hover:text-accent-ink" href={SOURCE_URL} title={s.footer.openSource}>
             {s.footer.source}
-          </a>
-          <a className="text-label hover:text-accent-ink" href={`mailto:${CONTACT}`}>
-            {CONTACT}
           </a>
         </p>
       </div>

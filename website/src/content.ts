@@ -140,7 +140,7 @@ export function structuredData(lang: Lang, page: Page, dateModified: string) {
   const locale = LANGS.find((l) => l.code === lang)!.locale
   const [title, description] = titleAndDescription(lang, page)
   const pageUrl = url(lang, page)
-  const author = { '@type': 'Person', '@id': `${SITE_URL}/#author`, name: 'hmiguel', url: 'https://github.com/hmiguel', email: CONTACT }
+  const author = { '@type': 'Person', '@id': `${SITE_URL}/#author`, name: 'hmiguel', url: 'https://github.com/hmiguel' }
   const website = {
     '@type': 'WebSite',
     '@id': `${SITE_URL}/#website`,

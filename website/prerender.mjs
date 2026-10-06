@@ -122,6 +122,15 @@ Sitemap: ${SITE_URL}/sitemap.xml
 `,
 )
 
+// The help page used to live at /support/: keep old links working.
+write(
+  '_redirects',
+  LANGS.flatMap(({ code }) => {
+    const old = `${code === 'en' ? '' : `/${code}`}/support`
+    return [`${old} ${pathFor(code, 'support')} 301`, `${old}/* ${pathFor(code, 'support')} 301`]
+  }).join('\n') + '\n',
+)
+
 // Cloudflare Pages headers: nothing third-party is ever loaded, so lock everything to this origin.
 write(
   '_headers',

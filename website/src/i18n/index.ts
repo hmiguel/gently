@@ -35,8 +35,11 @@ export function texts(lang: Lang) {
   return { s: SITE[lang], app: APP[lang] }
 }
 
+/** URL segment per page (the support page is published as /help/). */
+const SLUGS: Record<Exclude<Page, 'home'>, string> = { privacy: 'privacy', support: 'help' }
+
 /** URL path for a page: English at the root, others under /<lang>/. Always ends with "/". */
 export function pathFor(lang: Lang, page: Page) {
   const base = lang === 'en' ? '/' : `/${lang}/`
-  return page === 'home' ? base : `${base}${page}/`
+  return page === 'home' ? base : `${base}${SLUGS[page]}/`
 }

@@ -85,29 +85,6 @@ Xiaomi/HyperOS also needs **Install via USB** enabled in Developer options.
 - `npm run assets` renders the legacy launcher PNGs and the Play Store files in `resources/store/`
   (`icon-512.png`, `feature-graphic.png`) using your installed Chrome
 
-## Releasing to Google Play
-
-The version lives in `package.json` only (`1.2.3` becomes `versionName 1.2.3`, `versionCode 10203`).
-Bump it with `npm version patch|minor|major` before every upload.
-
-```sh
-export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
-npm run release
-# -> android/app/build/outputs/bundle/release/app-release.aab   (upload to Play)
-# -> android/app/build/outputs/apk/release/app-release.apk      (install on a device to test)
-```
-
-Release builds are shrunk with R8 and signed with the **upload key** described in
-`android/keystore.properties` (git-ignored; the keystore itself lives in `~/.android-keys/`).
-The app uses Play App Signing, so Google holds the app signing key; a lost upload key can be reset
-through Play Console support. **Back up both files anyway.**
-
-Store copy, Data safety answers and the privacy policy draft are in `docs/`. Graphics are in
-`resources/store/`; regenerate them with `npm run assets` and (with `npx vite --port 5199` running)
-`npm run screenshots`.
-
-> Build, release and debugging notes for maintainers and coding agents: [AGENTS.md](AGENTS.md).
-
 ## Releases
 
 `npm version patch && git push --follow-tags` publishes a signed APK as a GitHub Release and, once

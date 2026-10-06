@@ -130,6 +130,7 @@ write(
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  Cache-Control: public, max-age=0, must-revalidate, no-transform
 
 /*.md
   Content-Type: text/markdown; charset=utf-8

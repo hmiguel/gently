@@ -169,8 +169,10 @@ public class CallGuardPlugin extends Plugin {
     }
 
     /**
-     * Android's default-apps screen, where the user can hand "Caller ID & spam" back to
-     * their Phone app. Resolves with the updated status when they return.
+     * Android's default-apps list, where the user can hand "Caller ID & spam" back to their
+     * Phone app. The screen for that single role (MANAGE_DEFAULT_APP) needs the system-only
+     * MANAGE_ROLE_HOLDERS permission, so the UI explains which row to pick before opening
+     * the list. Resolves with the updated status on return.
      */
     @PluginMethod
     public void openDefaultApps(PluginCall call) {

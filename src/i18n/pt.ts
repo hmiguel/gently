@@ -161,7 +161,7 @@ export const pt: Messages = {
       outgoing: { title: 'Chamadas efetuadas', description: 'App de redirecionamento de chamadas' },
       incoming: { title: 'Chamadas recebidas', description: 'App de identificação e spam, e contactos' },
     },
-    restoreSpam: { title: 'Repor proteção contra spam', description: 'Devolve a identificação e spam à app Telefone. O bloqueio de chamadas recebidas para.' },
+    restoreSpam: { title: 'Repor proteção contra spam', description: 'Devolve a identificação e spam à app Telefone. O bloqueio de chamadas recebidas para.' , steps: ['Toque em “App de identificação e spam”', 'Escolha a app Telefone', 'Volte ao Gently'], open: 'Abrir apps predefinidas' },
     granted: 'Concedida',
     grant: 'Conceder',
     language: 'Idioma',

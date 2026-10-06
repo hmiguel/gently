@@ -90,6 +90,11 @@ them means uninstalling (which wipes rules, code and log).
 - **Xiaomi / HyperOS:** enable *Install via USB* in Developer options; installing a *new* package over
   adb needs an on-phone confirmation; the permission prompt may never show after a denial, which is why
   Gently falls back to its App info page
+- **Default-app screens:** a normal app can't open the screen for a single role
+  (`MANAGE_DEFAULT_APP` needs the system-only `MANAGE_ROLE_HOLDERS`), only the full Default apps list,
+  so the UI explains which row to pick before opening it
+- **Spam protection:** Android has one Caller ID & spam slot; holding it for incoming rules pauses the
+  phone's own spam filtering (e.g. Google Phone). Only request it when a rule covers incoming calls
 - **Play screenshots:** the long side may be at most twice the short side (1080×2400 is rejected)
 - **Emulator** on this Mac is unreliable (QEMU hangs); prefer a real phone over Wireless debugging
 - **Never place real calls to test international rules** (cost); the device tests cover them

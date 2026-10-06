@@ -172,7 +172,7 @@ export const en = {
       outgoing: { title: 'Outgoing calls', description: 'Call redirection app' },
       incoming: { title: 'Incoming calls', description: 'Caller ID & spam app, and contacts' },
     },
-    restoreSpam: { title: 'Restore spam protection', description: 'Give Caller ID & spam back to your Phone app. Incoming blocking stops.' },
+    restoreSpam: { title: 'Restore spam protection', description: 'Give Caller ID & spam back to your Phone app. Incoming blocking stops.' , steps: ['Tap “Caller ID & spam app”', 'Choose your Phone app', 'Come back to Gently'], open: 'Open Default apps' },
     granted: 'Granted',
     grant: 'Grant',
     language: 'Language',

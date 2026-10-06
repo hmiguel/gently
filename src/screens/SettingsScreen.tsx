@@ -1,5 +1,6 @@
-import { Check, ExternalLink, KeyRound } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { Check, ChevronDown, ExternalLink, KeyRound } from 'lucide-react'
+import { useState, type ReactNode } from 'react'
+import { Button } from '../components/ui'
 import { FormScreen, FormSection, OptionList } from '../components/FormScreen'
 import { LANGUAGES, useI18n, type Language, type TimeFormat } from '../i18n'
 import { tap } from '../lib/haptics'
@@ -86,6 +87,7 @@ export function SettingsScreen({
 }) {
   const { m, language, setLanguage, timeFormat, setTimeFormat, phoneIs24Hour } = useI18n()
   const t = m.settings
+  const [showRestoreSteps, setShowRestoreSteps] = useState(false)
 
   // Each option shows a sample time (15:32) in that style.
   const sample = (hourCycle: 'h12' | 'h23') =>
@@ -157,12 +159,36 @@ export function SettingsScreen({
           ),
         )}
         {permissions.incoming && (
-          <Row
-            title={t.restoreSpam.title}
-            description={t.restoreSpam.description}
-            trailing={<ExternalLink strokeWidth={2.5} className="size-5 shrink-0" aria-hidden />}
-            onClick={onRestoreSpam}
-          />
+          <>
+            <Row
+              title={t.restoreSpam.title}
+              description={t.restoreSpam.description}
+              trailing={
+                <ChevronDown
+                  strokeWidth={2.5}
+                  className={`size-5 shrink-0 transition-transform duration-200 ease-out ${showRestoreSteps ? 'rotate-180' : ''}`}
+                  aria-hidden
+                />
+              }
+              onClick={() => setShowRestoreSteps(!showRestoreSteps)}
+            />
+            {/* Android only lets apps open the full default-apps list, so say which row to pick first. */}
+            {showRestoreSteps && (
+              <div className="swiss-diagonal border-t-2 border-ink bg-muted px-6 py-5">
+                <ol className="space-y-2">
+                  {t.restoreSpam.steps.map((step, i) => (
+                    <li key={step} className="flex gap-3 text-sm font-medium">
+                      <span className="text-label pt-0.5 text-accent-ink tabular-nums">{String(i + 1).padStart(2, '0')}</span>
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+                <Button variant="secondary" className="mt-5" onClick={onRestoreSpam}>
+                  {t.restoreSpam.open} <ExternalLink strokeWidth={2.5} className="size-5" />
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </FormSection>
 

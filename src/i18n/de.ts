@@ -161,7 +161,7 @@ export const de: Messages = {
       outgoing: { title: 'Ausgehende Anrufe', description: 'App für Anrufweiterleitung' },
       incoming: { title: 'Eingehende Anrufe', description: 'App für Anrufer-ID und Spam, und Kontakte' },
     },
-    restoreSpam: { title: 'Spamschutz zurückgeben', description: 'Gibt Anrufer-ID und Spam an deine Telefon-App zurück. Das Sperren eingehender Anrufe endet.' },
+    restoreSpam: { title: 'Spamschutz zurückgeben', description: 'Gibt Anrufer-ID und Spam an deine Telefon-App zurück. Das Sperren eingehender Anrufe endet.' , steps: ['Tippe auf „Anrufer-ID- und Spam-App“', 'Wähle deine Telefon-App', 'Kehre zu Gently zurück'], open: 'Standard-Apps öffnen' },
     granted: 'Erteilt',
     grant: 'Erteilen',
     language: 'Sprache',

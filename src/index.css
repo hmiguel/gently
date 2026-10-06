@@ -101,6 +101,7 @@
 
 /* Massive headline: fills the phone width without overflowing ~8 characters. */
 @utility text-display {
+  hyphens: auto;
   font-size: clamp(3.25rem, 16vw, 8rem);
   line-height: 0.85;
   font-weight: 900;

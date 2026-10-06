@@ -8,8 +8,8 @@ Product overview and permissions are in [README.md](README.md).
 - `src/`: React + TypeScript + Tailwind v4 UI. Design tokens live only in `src/index.css`
   (Swiss style: paper/ink/muted/accent `#FF3000`, 0 radius, 4px rules, Inter)
 - `src/plugins/`: TypeScript contracts for the native plugins, with browser mocks for `npm run dev`
-- `src/i18n/`: **all UI text**. `en.ts` defines the shape; `pt.ts` (pt-PT), `es.ts` (es-ES) and
-  `fr.ts` (fr-FR) are typed against it, so a missing translation fails the build. A new language is a
+- `src/i18n/`: **all UI text**. `en.ts` defines the shape; `pt.ts` (pt-PT), `es.ts` (es-ES),
+  `fr.ts` (fr-FR) and `de.ts` (de-DE, informal "du") are typed against it, so a missing translation fails the build. A new language is a
   new file plus one line in `MESSAGES` and `LANGUAGES` in `src/i18n/index.ts`. Components read it with `const { m } = useI18n()`. Rule
   sentences (`m.rules.describe`) and dates use the selected language. Display headlines (`text-display`)
   fit ~8 characters per word at 360px: keep translated titles short

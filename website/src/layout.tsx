@@ -1,3 +1,4 @@
+import { Heart } from 'lucide-react'
 import { Fragment, type CSSProperties, type ReactNode } from 'react'
 import { MADE_IN, markdownPath, SOURCE_URL, SPONSOR_URL, structuredData, titleAndDescription } from './content'
 import { LANGS, pathFor, SITE_URL, texts, TEST_URL, type Lang, type Page } from './i18n'
@@ -87,13 +88,14 @@ function Header({ lang, page }: { lang: Lang; page: Page }) {
             Gently<span className="text-accent">.</span>
           </span>
         </a>
-        {/* Phones: logo + ♥ on the first row, links below. Wider: one row, ♥ last. */}
+        {/* Phones: logo + heart on the first row, links below. Wider: one row, sponsor last. */}
         <a
           href={SPONSOR_URL}
           aria-label={s.footer.sponsor}
-          className="text-label order-2 ml-auto border-2 border-accent px-3 py-2 text-accent-ink transition-colors duration-150 ease-linear hover:bg-accent hover:text-paper sm:order-3 sm:ml-0"
+          className="text-label order-2 ml-auto inline-flex items-center gap-2 border-2 border-accent px-3 py-2 text-accent-ink transition-colors duration-150 ease-linear hover:bg-accent hover:text-paper sm:order-3 sm:ml-0"
         >
-          ♥<span className="hidden sm:inline"> {s.footer.sponsor}</span>
+          <Heart strokeWidth={2.5} className="size-4" aria-hidden />
+          <span className="hidden sm:inline">{s.footer.sponsor}</span>
         </a>
         <nav
           className="order-3 flex basis-full flex-wrap items-center gap-x-2 sm:order-2 sm:ml-auto sm:basis-auto"
@@ -151,8 +153,9 @@ function Footer({ lang }: { lang: Lang }) {
           <a className="text-label hover:text-accent-ink" href={SOURCE_URL} title={s.footer.openSource}>
             {s.footer.source}
           </a>
-          <a className="text-label text-accent-ink hover:text-ink" href={SPONSOR_URL}>
-            ♥ {s.footer.sponsor}
+          <a className="text-label inline-flex items-center gap-1.5 text-accent-ink hover:text-ink" href={SPONSOR_URL}>
+            <Heart strokeWidth={2.5} className="size-3.5" aria-hidden />
+            {s.footer.sponsor}
           </a>
         </p>
       </div>

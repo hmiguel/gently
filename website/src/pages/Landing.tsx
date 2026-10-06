@@ -1,3 +1,4 @@
+import { Heart } from 'lucide-react'
 import { features, SCREEN_WIDTHS, SCREENS, SPONSOR_URL } from '../content'
 import { Blocks, Display, JoinButton, SectionLabel } from '../layout'
 import { pathFor, texts, type Lang } from '../i18n'
@@ -136,7 +137,7 @@ export function Landing({ lang }: { lang: Lang }) {
             className="inline-flex h-16 w-full items-center justify-between gap-6 border-4 border-ink bg-paper px-6 text-sm font-bold uppercase tracking-[0.15em] transition-colors duration-150 ease-linear hover:bg-ink hover:text-paper sm:w-auto lg:justify-self-end"
           >
             {s.home.sponsorCta}
-            <span aria-hidden className="text-accent">♥</span>
+            <Heart strokeWidth={2.5} className="size-5 text-accent" aria-hidden />
           </a>
         </div>
       </section>

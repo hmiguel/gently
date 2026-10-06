@@ -27,9 +27,12 @@ export function LogScreen({
   rules: Rule[]
   onClear: () => void
 }) {
-  const { m } = useI18n()
+  const { m, hourCycle } = useI18n()
   const [confirming, setConfirming] = useState(false)
-  const time = useMemo(() => new Intl.DateTimeFormat(m.locale, { hour: '2-digit', minute: '2-digit' }), [m])
+  const time = useMemo(
+    () => new Intl.DateTimeFormat(m.locale, { hour: '2-digit', minute: '2-digit', hourCycle }),
+    [m, hourCycle],
+  )
   const day = useMemo(() => new Intl.DateTimeFormat(m.locale, { day: '2-digit', month: 'short' }), [m])
 
   return (

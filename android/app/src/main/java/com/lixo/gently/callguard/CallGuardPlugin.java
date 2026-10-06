@@ -83,6 +83,14 @@ public class CallGuardPlugin extends Plugin {
         call.resolve(ret);
     }
 
+    /** The phone's own 12/24-hour setting, which the WebView can't see. */
+    @PluginMethod
+    public void timeFormat(PluginCall call) {
+        JSObject ret = new JSObject();
+        ret.put("is24Hour", android.text.format.DateFormat.is24HourFormat(getContext()));
+        call.resolve(ret);
+    }
+
     @PluginMethod
     public void getStatus(PluginCall call) {
         RuleStore store = store();

@@ -1,7 +1,7 @@
 import { Check, KeyRound } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { FormScreen, FormSection, OptionList } from '../components/FormScreen'
-import { LANGUAGES, useI18n, type Language } from '../i18n'
+import { LANGUAGES, useI18n, type Language, type TimeFormat } from '../i18n'
 import { tap } from '../lib/haptics'
 import type { Permissions } from '../plugins/callguard'
 
@@ -81,8 +81,17 @@ export function SettingsScreen({
   onRequestPermission: (direction: keyof Permissions) => void
   onClose: () => void
 }) {
-  const { m, language, setLanguage } = useI18n()
+  const { m, language, setLanguage, timeFormat, setTimeFormat, phoneIs24Hour } = useI18n()
   const t = m.settings
+
+  // Each option shows a sample time (15:32) in that style.
+  const sample = (hourCycle: 'h12' | 'h23') =>
+    new Intl.DateTimeFormat(m.locale, { hour: 'numeric', minute: '2-digit', hourCycle }).format(new Date(2026, 0, 1, 15, 32))
+  const timeOptions: { value: TimeFormat; title: string; description: string }[] = [
+    { value: 'system', title: t.systemTime, description: t.systemTimeHint(phoneIs24Hour ? 24 : 12) },
+    { value: '12', title: t.hours12, description: sample('h12') },
+    { value: '24', title: t.hours24, description: sample('h23') },
+  ]
 
   const languageOptions: { value: Language; title: string; description: string }[] = [
     { value: 'system', title: t.systemLanguage, description: t.systemLanguageHint },
@@ -117,7 +126,11 @@ export function SettingsScreen({
         <OptionList label={t.language} options={languageOptions} value={language} onChange={setLanguage} />
       </FormSection>
 
-      <FormSection index="0.3" label={t.permissions}>
+      <FormSection index="0.3" label={t.timeFormat}>
+        <OptionList label={t.timeFormat} options={timeOptions} value={timeFormat} onChange={setTimeFormat} />
+      </FormSection>
+
+      <FormSection index="0.4" label={t.permissions}>
         {PERMISSION_KEYS.map((key) =>
           permissions[key] ? (
             <Row

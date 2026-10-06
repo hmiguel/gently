@@ -177,6 +177,11 @@ export const en = {
     language: 'Language',
     systemLanguage: 'System default',
     systemLanguageHint: "Follows the phone's language",
+    timeFormat: 'Time format',
+    systemTime: 'System default',
+    systemTimeHint: (hours: number) => `Follows the phone (${hours}-hour)`,
+    hours12: '12-hour',
+    hours24: '24-hour',
   },
 
   about: {

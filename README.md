@@ -10,7 +10,8 @@ Android app that blocks outgoing and incoming calls, protected by an access code
   The app locks whenever it leaves the screen; the code can be changed in Settings (current code required)
 - **Log:** every blocked attempt, with time, number and direction
 - **Settings** (⚙): turn the access code on/off (on by default; turning it off needs the code), change it,
-  choose the language (system, English, Português, Español, Français, Deutsch), see and re-grant permissions
+  choose the language (system, English, Português, Español, Français, Deutsch) and the clock
+  (system, 12-hour, 24-hour), see and re-grant permissions
 - **About** (ⓘ): how it works, what each permission is for, privacy, version
 - Emergency numbers are never blocked (Android enforces this)
 

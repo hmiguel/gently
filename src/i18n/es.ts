@@ -166,6 +166,11 @@ export const es: Messages = {
     language: 'Idioma',
     systemLanguage: 'Idioma del sistema',
     systemLanguageHint: 'Sigue el idioma del móvil',
+    timeFormat: 'Formato de hora',
+    systemTime: 'Del sistema',
+    systemTimeHint: (hours) => `Sigue al móvil (${hours} horas)`,
+    hours12: '12 horas',
+    hours24: '24 horas',
   },
 
   about: {

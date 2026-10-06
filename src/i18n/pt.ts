@@ -166,6 +166,11 @@ export const pt: Messages = {
     language: 'Idioma',
     systemLanguage: 'Idioma do sistema',
     systemLanguageHint: 'Segue o idioma do telemóvel',
+    timeFormat: 'Formato da hora',
+    systemTime: 'Do sistema',
+    systemTimeHint: (hours) => `Segue o telemóvel (${hours} horas)`,
+    hours12: '12 horas',
+    hours24: '24 horas',
   },
 
   about: {

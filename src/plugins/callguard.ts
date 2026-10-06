@@ -64,6 +64,8 @@ export interface Capabilities {
 
 export interface CallGuardPlugin {
   capabilities(): Promise<Capabilities>
+  /** The phone's 12/24-hour setting. */
+  timeFormat(): Promise<{ is24Hour: boolean }>
   getStatus(): Promise<Status>
   setRules(rules: Rules): Promise<Status>
   requestPermission(options: { direction: 'outgoing' | 'incoming' }): Promise<Status>
@@ -101,6 +103,10 @@ class CallGuardWeb extends WebPlugin implements CallGuardPlugin {
 
   async capabilities() {
     return { blockOutgoing: true, blockIncoming: true }
+  }
+
+  async timeFormat() {
+    return { is24Hour: !new Intl.DateTimeFormat(undefined, { hour: 'numeric' }).resolvedOptions().hour12 }
   }
 
   async getStatus(): Promise<Status> {

@@ -30,11 +30,20 @@ export function resolveMessages(language: Language): Messages {
   return isLanguage(phone) && phone !== 'system' ? MESSAGES[phone] : en
 }
 
+/** Clock style for times: follow the phone, or force one. */
+export type TimeFormat = 'system' | '12' | '24'
+
 export interface I18n {
   /** Messages for the effective language. */
   m: Messages
   language: Language
   setLanguage: (language: Language) => void
+  timeFormat: TimeFormat
+  setTimeFormat: (format: TimeFormat) => void
+  /** The phone's own setting, for the "system" option's label. */
+  phoneIs24Hour: boolean
+  /** Effective choice: pass as `hourCycle` to Intl.DateTimeFormat. */
+  hourCycle: 'h12' | 'h23'
 }
 
 export const I18nContext = createContext<I18n | null>(null)

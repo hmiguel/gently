@@ -166,6 +166,11 @@ export const de: Messages = {
     language: 'Sprache',
     systemLanguage: 'Systemsprache',
     systemLanguageHint: 'Folgt der Sprache des Handys',
+    timeFormat: 'Zeitformat',
+    systemTime: 'System',
+    systemTimeHint: (hours) => `Folgt dem Handy (${hours} Stunden)`,
+    hours12: '12 Stunden',
+    hours24: '24 Stunden',
   },
 
   about: {

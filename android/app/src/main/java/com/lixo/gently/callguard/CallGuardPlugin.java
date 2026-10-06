@@ -168,6 +168,19 @@ public class CallGuardPlugin extends Plugin {
         else openAppSettings(call);
     }
 
+    /**
+     * Android's default-apps screen, where the user can hand "Caller ID & spam" back to
+     * their Phone app. Resolves with the updated status when they return.
+     */
+    @PluginMethod
+    public void openDefaultApps(PluginCall call) {
+        Intent intent = new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS);
+        if (intent.resolveActivity(getContext().getPackageManager()) == null) {
+            intent = new Intent(Settings.ACTION_SETTINGS);
+        }
+        startActivityForResult(call, intent, "onSettingsResult");
+    }
+
     private void openAppSettings(PluginCall call) {
         Log.i(TAG, "opening app settings for contacts");
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,

@@ -59,7 +59,7 @@ export const en = {
       },
       incoming: {
         title: 'Incoming: access required',
-        body: 'Choose Gently as the caller ID & spam app, then allow Contacts (Android only lets Gently screen calls from saved contacts with it). If no prompt appears, Gently opens its settings: turn on Contacts under Permissions.',
+        body: "Choose Gently as the caller ID & spam app, then allow Contacts (Android only lets Gently screen calls from saved contacts with it). If no prompt appears, Gently opens its settings: turn on Contacts under Permissions. Note: this replaces your phone's own spam protection (e.g. Google Phone) until you switch back in Settings.",
       },
     },
     grantAccess: 'Grant access',
@@ -172,6 +172,7 @@ export const en = {
       outgoing: { title: 'Outgoing calls', description: 'Call redirection app' },
       incoming: { title: 'Incoming calls', description: 'Caller ID & spam app, and contacts' },
     },
+    restoreSpam: { title: 'Restore spam protection', description: 'Give Caller ID & spam back to your Phone app. Incoming blocking stops.' },
     granted: 'Granted',
     grant: 'Grant',
     language: 'Language',
@@ -205,7 +206,7 @@ export const en = {
     permissions: 'Permissions',
     permissionPoints: [
       { title: 'Call redirection', body: 'Lets Gently stop outgoing calls before they connect.' },
-      { title: 'Caller ID & spam', body: 'Lets Gently reject incoming calls before your phone rings.' },
+      { title: 'Caller ID & spam', body: "Lets Gently reject incoming calls before your phone rings. Only one app can hold it, so your phone's own spam protection pauses while Gently does." },
       {
         title: 'Contacts',
         body: 'Android only passes calls from saved contacts to apps that may read contacts. Gently never reads your address book.',

@@ -56,7 +56,7 @@ export const fr: Messages = {
       },
       incoming: {
         title: 'Entrants : accès requis',
-        body: "Choisissez Gently comme appli d'identification de l'appelant et de spam, puis autorisez les Contacts (Android ne laisse Gently filtrer les appels de vos contacts qu'avec cette autorisation). Si aucune demande n'apparaît, Gently ouvre ses paramètres : activez Contacts dans Autorisations.",
+        body: "Choisissez Gently comme appli d'identification de l'appelant et de spam, puis autorisez les Contacts (Android ne laisse Gently filtrer les appels de vos contacts qu'avec cette autorisation). Si aucune demande n'apparaît, Gently ouvre ses paramètres : activez Contacts dans Autorisations. Remarque : cela remplace la protection anti-spam du téléphone (p. ex. Téléphone de Google) jusqu'à ce que vous la rétablissiez dans les Réglages.",
       },
     },
     grantAccess: "Donner l'accès",
@@ -161,6 +161,7 @@ export const fr: Messages = {
       outgoing: { title: 'Appels sortants', description: "Appli de redirection d'appels" },
       incoming: { title: 'Appels entrants', description: "Appli d'identification et de spam, et contacts" },
     },
+    restoreSpam: { title: "Rétablir l'anti-spam", description: "Rend l'identification et le spam à l'appli Téléphone. Le blocage des appels entrants s'arrête." },
     granted: 'Accordée',
     grant: 'Accorder',
     language: 'Langue',
@@ -194,7 +195,7 @@ export const fr: Messages = {
     permissions: 'Autorisations',
     permissionPoints: [
       { title: "Redirection d'appels", body: 'Permet à Gently de stopper les appels sortants avant la connexion.' },
-      { title: 'Identification et spam', body: 'Permet à Gently de rejeter les appels entrants avant que le téléphone sonne.' },
+      { title: 'Identification et spam', body: "Permet à Gently de rejeter les appels entrants avant que le téléphone sonne. Une seule appli peut l'avoir : la protection anti-spam du téléphone est donc en pause." },
       {
         title: 'Contacts',
         body: "Android ne transmet les appels de vos contacts qu'aux applis autorisées à lire les contacts. Gently ne lit jamais votre carnet d'adresses.",

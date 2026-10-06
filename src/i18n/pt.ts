@@ -56,7 +56,7 @@ export const pt: Messages = {
       },
       incoming: {
         title: 'Recebidas: acesso necessário',
-        body: 'Escolha o Gently como app de identificação de chamadas e spam e depois permita o acesso aos Contactos (o Android só deixa o Gently verificar chamadas de contactos guardados com essa permissão). Se não aparecer nenhum pedido, o Gently abre as definições: ative Contactos em Permissões.',
+        body: 'Escolha o Gently como app de identificação de chamadas e spam e depois permita o acesso aos Contactos (o Android só deixa o Gently verificar chamadas de contactos guardados com essa permissão). Se não aparecer nenhum pedido, o Gently abre as definições: ative Contactos em Permissões. Nota: isto substitui a proteção contra spam do telemóvel (p. ex. Google Telefone) até a devolver nas Definições.',
       },
     },
     grantAccess: 'Dar acesso',
@@ -161,6 +161,7 @@ export const pt: Messages = {
       outgoing: { title: 'Chamadas efetuadas', description: 'App de redirecionamento de chamadas' },
       incoming: { title: 'Chamadas recebidas', description: 'App de identificação e spam, e contactos' },
     },
+    restoreSpam: { title: 'Repor proteção contra spam', description: 'Devolve a identificação e spam à app Telefone. O bloqueio de chamadas recebidas para.' },
     granted: 'Concedida',
     grant: 'Conceder',
     language: 'Idioma',
@@ -194,7 +195,7 @@ export const pt: Messages = {
     permissions: 'Permissões',
     permissionPoints: [
       { title: 'Redirecionamento', body: 'Permite ao Gently travar chamadas efetuadas antes de ligarem.' },
-      { title: 'Identificação e spam', body: 'Permite ao Gently rejeitar chamadas recebidas antes de o telemóvel tocar.' },
+      { title: 'Identificação e spam', body: 'Permite ao Gently rejeitar chamadas recebidas antes de o telemóvel tocar. Só uma app a pode ter, por isso a proteção contra spam do telemóvel fica em pausa.' },
       {
         title: 'Contactos',
         body: 'O Android só passa chamadas de contactos guardados a apps que possam ler os contactos. O Gently nunca lê a sua lista de contactos.',

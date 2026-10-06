@@ -56,7 +56,7 @@ export const de: Messages = {
       },
       incoming: {
         title: 'Eingehend: Zugriff nötig',
-        body: 'Wähle Gently als App für Anrufer-ID und Spam und erlaube dann den Zugriff auf Kontakte (Android lässt Gently Anrufe gespeicherter Kontakte nur damit prüfen). Erscheint keine Anfrage, öffnet Gently seine Einstellungen: Aktiviere dort Kontakte unter Berechtigungen.',
+        body: 'Wähle Gently als App für Anrufer-ID und Spam und erlaube dann den Zugriff auf Kontakte (Android lässt Gently Anrufe gespeicherter Kontakte nur damit prüfen). Erscheint keine Anfrage, öffnet Gently seine Einstellungen: Aktiviere dort Kontakte unter Berechtigungen. Hinweis: Das ersetzt den Spamschutz deines Handys (z. B. Google Telefon), bis du ihn in den Einstellungen zurückgibst.',
       },
     },
     grantAccess: 'Zugriff erlauben',
@@ -161,6 +161,7 @@ export const de: Messages = {
       outgoing: { title: 'Ausgehende Anrufe', description: 'App für Anrufweiterleitung' },
       incoming: { title: 'Eingehende Anrufe', description: 'App für Anrufer-ID und Spam, und Kontakte' },
     },
+    restoreSpam: { title: 'Spamschutz zurückgeben', description: 'Gibt Anrufer-ID und Spam an deine Telefon-App zurück. Das Sperren eingehender Anrufe endet.' },
     granted: 'Erteilt',
     grant: 'Erteilen',
     language: 'Sprache',
@@ -194,7 +195,7 @@ export const de: Messages = {
     permissions: 'Berechtigungen',
     permissionPoints: [
       { title: 'Anrufweiterleitung', body: 'Damit stoppt Gently ausgehende Anrufe, bevor sie verbunden werden.' },
-      { title: 'Anrufer-ID und Spam', body: 'Damit lehnt Gently eingehende Anrufe ab, bevor dein Handy klingelt.' },
+      { title: 'Anrufer-ID und Spam', body: 'Damit lehnt Gently eingehende Anrufe ab, bevor dein Handy klingelt. Nur eine App kann das übernehmen, daher pausiert der Spamschutz deines Handys.' },
       {
         title: 'Kontakte',
         body: 'Android gibt Anrufe gespeicherter Kontakte nur an Apps weiter, die Kontakte lesen dürfen. Gently liest dein Adressbuch nie.',

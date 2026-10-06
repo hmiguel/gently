@@ -56,7 +56,7 @@ export const es: Messages = {
       },
       incoming: {
         title: 'Entrantes: acceso necesario',
-        body: 'Elige Gently como app de identificación de llamadas y spam y después permite el acceso a Contactos (Android solo deja a Gently revisar llamadas de contactos guardados con ese permiso). Si no aparece ninguna solicitud, Gently abre sus ajustes: activa Contactos en Permisos.',
+        body: 'Elige Gently como app de identificación de llamadas y spam y después permite el acceso a Contactos (Android solo deja a Gently revisar llamadas de contactos guardados con ese permiso). Si no aparece ninguna solicitud, Gently abre sus ajustes: activa Contactos en Permisos. Nota: esto sustituye la protección contra spam del móvil (p. ej., Teléfono de Google) hasta que la devuelvas en Ajustes.',
       },
     },
     grantAccess: 'Dar acceso',
@@ -161,6 +161,7 @@ export const es: Messages = {
       outgoing: { title: 'Llamadas salientes', description: 'App de redirección de llamadas' },
       incoming: { title: 'Llamadas entrantes', description: 'App de identificación y spam, y contactos' },
     },
+    restoreSpam: { title: 'Restaurar protección contra spam', description: 'Devuelve la identificación y spam a la app Teléfono. El bloqueo de entrantes se detiene.' },
     granted: 'Concedido',
     grant: 'Conceder',
     language: 'Idioma',
@@ -194,7 +195,7 @@ export const es: Messages = {
     permissions: 'Permisos',
     permissionPoints: [
       { title: 'Redirección', body: 'Permite a Gently detener las llamadas salientes antes de que conecten.' },
-      { title: 'Identificación y spam', body: 'Permite a Gently rechazar llamadas entrantes antes de que suene el móvil.' },
+      { title: 'Identificación y spam', body: 'Permite a Gently rechazar llamadas entrantes antes de que suene el móvil. Solo una app puede tenerlo, así que la protección contra spam del móvil queda en pausa.' },
       {
         title: 'Contactos',
         body: 'Android solo pasa las llamadas de contactos guardados a apps que pueden leer los contactos. Gently nunca lee tu agenda.',

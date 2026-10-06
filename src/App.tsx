@@ -112,6 +112,10 @@ export default function App() {
     setStatus(await withSystemDialog(() => CallGuard.requestPermission({ direction })))
   }
 
+  const restoreSpam = async () => {
+    setStatus(await withSystemDialog(() => CallGuard.openDefaultApps()))
+  }
+
   const pickContact = async () => (await withSystemDialog(() => ContactPicker.pickPhone())).contact
 
   if (phase === 'loading') return <div className="h-full bg-paper" />
@@ -221,6 +225,7 @@ export default function App() {
           onToggleLock={() => (lockEnabled ? setOverlay({ kind: 'disableLock' }) : changeLock(true))}
           onChangeCode={() => setOverlay({ kind: 'changeCode' })}
           onRequestPermission={requestPermission}
+          onRestoreSpam={restoreSpam}
           onClose={() => setOverlay(null)}
         />
       )}

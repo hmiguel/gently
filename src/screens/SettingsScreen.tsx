@@ -1,4 +1,4 @@
-import { Check, KeyRound } from 'lucide-react'
+import { Check, ExternalLink, KeyRound } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { FormScreen, FormSection, OptionList } from '../components/FormScreen'
 import { LANGUAGES, useI18n, type Language, type TimeFormat } from '../i18n'
@@ -69,6 +69,7 @@ export function SettingsScreen({
   onToggleLock,
   onChangeCode,
   onRequestPermission,
+  onRestoreSpam,
   onClose,
 }: {
   permissions: Permissions
@@ -79,6 +80,8 @@ export function SettingsScreen({
   onToggleLock: () => void
   onChangeCode: () => void
   onRequestPermission: (direction: keyof Permissions) => void
+  /** Hand "Caller ID & spam" back to the Phone app (Android's default-apps screen). */
+  onRestoreSpam: () => void
   onClose: () => void
 }) {
   const { m, language, setLanguage, timeFormat, setTimeFormat, phoneIs24Hour } = useI18n()
@@ -152,6 +155,14 @@ export function SettingsScreen({
               trailing={<span className="text-label shrink-0 bg-accent px-3 py-2 text-paper">{t.grant}</span>}
             />
           ),
+        )}
+        {permissions.incoming && (
+          <Row
+            title={t.restoreSpam.title}
+            description={t.restoreSpam.description}
+            trailing={<ExternalLink strokeWidth={2.5} className="size-5 shrink-0" aria-hidden />}
+            onClick={onRestoreSpam}
+          />
         )}
       </FormSection>
 

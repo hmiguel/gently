@@ -69,6 +69,8 @@ export interface CallGuardPlugin {
   getStatus(): Promise<Status>
   setRules(rules: Rules): Promise<Status>
   requestPermission(options: { direction: 'outgoing' | 'incoming' }): Promise<Status>
+  /** Opens Android's default-apps screen; resolves with the status on return. */
+  openDefaultApps(): Promise<Status>
   getLog(): Promise<{ entries: LogEntry[] }>
   clearLog(): Promise<void>
 }
@@ -122,6 +124,12 @@ class CallGuardWeb extends WebPlugin implements CallGuardPlugin {
   async requestPermission({ direction }: { direction: 'outgoing' | 'incoming' }) {
     const state = this.read()
     this.write({ ...state, permissions: { ...state.permissions, [direction]: true } })
+    return this.getStatus()
+  }
+
+  async openDefaultApps() {
+    const state = this.read()
+    this.write({ ...state, permissions: { ...state.permissions, incoming: false } })
     return this.getStatus()
   }
 

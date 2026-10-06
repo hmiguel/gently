@@ -80,14 +80,25 @@ function Header({ lang, page }: { lang: Lang; page: Page }) {
   const link = 'text-label px-2 py-3 hover:text-accent-ink'
   return (
     <header className="border-b-4 border-ink">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-4">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-6 py-4">
         <a href={pathFor(lang, 'home')} className="flex items-center gap-3 text-xl font-black uppercase tracking-tighter">
           <Mark className="size-7" />
           <span>
             Gently<span className="text-accent">.</span>
           </span>
         </a>
-        <nav className="flex flex-wrap items-center gap-x-2" aria-label="Gently">
+        {/* Phones: logo + ♥ on the first row, links below. Wider: one row, ♥ last. */}
+        <a
+          href={SPONSOR_URL}
+          aria-label={s.footer.sponsor}
+          className="text-label order-2 ml-auto border-2 border-accent px-3 py-2 text-accent-ink transition-colors duration-150 ease-linear hover:bg-accent hover:text-paper sm:order-3 sm:ml-0"
+        >
+          ♥<span className="hidden sm:inline"> {s.footer.sponsor}</span>
+        </a>
+        <nav
+          className="order-3 flex basis-full flex-wrap items-center gap-x-2 sm:order-2 sm:ml-auto sm:basis-auto"
+          aria-label="Gently"
+        >
           <a href={pathFor(lang, 'privacy')} className={link} aria-current={page === 'privacy' ? 'page' : undefined}>
             {s.nav.privacy}
           </a>

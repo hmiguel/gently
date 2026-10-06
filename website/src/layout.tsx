@@ -1,4 +1,4 @@
-import { Heart } from 'lucide-react'
+import { ChevronDown, Globe, Heart } from 'lucide-react'
 import { Fragment, type CSSProperties, type ReactNode } from 'react'
 import { MADE_IN, markdownPath, SOURCE_URL, SPONSOR_URL, structuredData, titleAndDescription } from './content'
 import { LANGS, pathFor, SITE_URL, texts, TEST_URL, type Lang, type Page } from './i18n'
@@ -76,31 +76,60 @@ export function Mark({ className = '' }: { className?: string }) {
   )
 }
 
+/**
+ * Language picker as a compact dropdown: most visitors never need it (the site already opens
+ * in their browser's language), so it stays out of the way. Native <details>, so it works
+ * without JavaScript; site.js closes it on an outside click or Escape.
+ */
+function LanguageMenu({ lang, page, className }: { lang: Lang; page: Page; className: string }) {
+  const { s } = texts(lang)
+  return (
+    <details data-menu className={`group relative ${className}`}>
+      <summary
+        aria-label={s.nav.language}
+        className="text-label inline-flex cursor-pointer list-none items-center gap-1.5 border-2 border-ink px-3 py-2 transition-colors duration-150 ease-linear hover:bg-ink hover:text-paper group-open:bg-ink group-open:text-paper [&::-webkit-details-marker]:hidden"
+      >
+        <Globe strokeWidth={2.5} className="size-4" aria-hidden />
+        {lang}
+        <ChevronDown strokeWidth={2.5} className="size-3.5 transition-transform duration-200 ease-out group-open:rotate-180" aria-hidden />
+      </summary>
+      <ul className="absolute right-0 top-full z-50 mt-2 min-w-48 border-4 border-ink bg-paper">
+        {LANGS.map((l) => (
+          <li key={l.code} className="border-b-2 border-ink last:border-b-0">
+            <a
+              href={pathFor(l.code, page)}
+              hrefLang={l.locale}
+              lang={l.locale}
+              data-lang={l.code}
+              aria-current={l.code === lang ? 'true' : undefined}
+              className={`text-label flex items-center justify-between gap-4 px-4 py-3 transition-colors duration-150 ease-linear ${
+                l.code === lang ? 'bg-ink text-paper' : 'hover:bg-muted'
+              }`}
+            >
+              {l.name}
+              <span className={l.code === lang ? 'text-accent' : 'text-ink/40'}>{l.code}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </details>
+  )
+}
+
 function Header({ lang, page }: { lang: Lang; page: Page }) {
   const { s } = texts(lang)
   const link = 'text-label px-2 py-3 hover:text-accent-ink'
   return (
     <header className="border-b-4 border-ink">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-6 py-4">
-        <a href={pathFor(lang, 'home')} className="flex items-center gap-3 text-xl font-black uppercase tracking-tighter">
+      {/* One row on wide screens. Phones: logo + language + sponsor, then the links. */}
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-1 px-6 py-4">
+        <a href={pathFor(lang, 'home')} className="mr-3 flex items-center gap-3 text-xl font-black uppercase tracking-tighter">
           <Mark className="size-7" />
           <span>
             Gently<span className="text-accent">.</span>
           </span>
         </a>
-        {/* Phones: logo + heart on the first row, links below. Wider: one row, sponsor last. */}
-        <a
-          href={SPONSOR_URL}
-          aria-label={s.footer.sponsor}
-          className="text-label order-2 ml-auto inline-flex items-center gap-2 border-2 border-accent px-3 py-2 text-accent-ink transition-colors duration-150 ease-linear hover:bg-accent hover:text-paper sm:order-3 sm:ml-0"
-        >
-          <Heart strokeWidth={2.5} className="size-4" aria-hidden />
-          <span className="hidden sm:inline">{s.footer.sponsor}</span>
-        </a>
-        <nav
-          className="order-3 flex basis-full flex-wrap items-center gap-x-2 sm:order-2 sm:ml-auto sm:basis-auto"
-          aria-label="Gently"
-        >
+        <nav className="order-4 flex basis-full items-center gap-x-2 sm:order-2 sm:ml-auto sm:basis-auto" aria-label="Gently">
           <a href={pathFor(lang, 'privacy')} className={link} aria-current={page === 'privacy' ? 'page' : undefined}>
             {s.nav.privacy}
           </a>
@@ -108,26 +137,16 @@ function Header({ lang, page }: { lang: Lang; page: Page }) {
             {s.nav.support}
           </a>
         </nav>
+        <LanguageMenu lang={lang} page={page} className="order-2 ml-auto sm:order-3 sm:ml-0" />
+        <a
+          href={SPONSOR_URL}
+          aria-label={s.footer.sponsor}
+          className="text-label order-3 inline-flex items-center gap-2 border-2 border-accent px-3 py-2 text-accent-ink transition-colors duration-150 ease-linear hover:bg-accent hover:text-paper sm:order-4"
+        >
+          <Heart strokeWidth={2.5} className="size-4" aria-hidden />
+          <span className="hidden sm:inline">{s.footer.sponsor}</span>
+        </a>
       </div>
-      {/* Language switcher: plain links, so it works without JS; site.js remembers the choice. */}
-      <nav aria-label={s.nav.language} className="border-t-2 border-ink">
-        <ul className="mx-auto flex max-w-6xl flex-wrap px-4">
-          {LANGS.map((l) => (
-            <li key={l.code}>
-              <a
-                href={pathFor(l.code, page)}
-                hrefLang={l.locale}
-                lang={l.locale}
-                data-lang={l.code}
-                aria-current={l.code === lang ? 'true' : undefined}
-                className={`text-label block px-2 py-2 ${l.code === lang ? 'bg-ink text-paper' : 'hover:text-accent-ink'}`}
-              >
-                {l.name}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
     </header>
   )
 }

@@ -33,29 +33,38 @@ Always use `:app:` task paths: the Capacitor sub-modules' own test tasks fail an
 
 Version lives only in `package.json` (`1.2.3` → versionName `1.2.3`, versionCode `10203`).
 
-### GitHub Release (APK)
+### One command, both stores
 
 ```sh
+# edit distribution/whatsnew/whatsnew-en-US (Play "What's new", max 500 chars)
 npm version patch          # or minor / major: bumps package.json, commits, tags vX.Y.Z
-git push --follow-tags     # .github/workflows/release.yml builds, signs, publishes (~2–3 min)
+git push --follow-tags     # .github/workflows/release.yml takes it from here
 ```
 
-- The workflow fails if the tag doesn't match `package.json`
-- Signed with the **GitHub release key** (secrets `GH_RELEASE_KEYSTORE_BASE64`,
-  `GH_RELEASE_KEYSTORE_PASSWORD`, `GH_RELEASE_KEY_ALIAS`; backup `~/.android-keys/gently-github.*`)
-- Actions → Release APK → *Run workflow* builds a test APK artifact without a release
-- Releases are private while the repo is private
+The workflow (`.github/workflows/release.yml`, shared setup in `.github/actions/prepare`) runs:
 
-### Google Play (AAB)
+| Job | Key (secrets) | Output |
+|---|---|---|
+| `version` | none | fails if the tag doesn't match `package.json` |
+| `apk` | GitHub release key (`GH_RELEASE_*`) | signed APK attached to a GitHub Release |
+| `play` | Play upload key (`PLAY_UPLOAD_*`) | AAB + R8 mapping uploaded to Google Play |
+
+- `play` skips itself until the secret `PLAY_SERVICE_ACCOUNT_JSON` exists. Track: closed testing
+  (`alpha`) unless the repo variable `PLAY_TRACK` says `internal` / `beta` / `production`
+- Actions → Release → *Run workflow* builds a test APK artifact only (no release, no Play upload)
+- Key backups: `~/.android-keys/` (`gently-upload.*` for Play, `gently-github.*` for GitHub)
+- GitHub releases are private while the repo is private
+
+### Google Play by hand (first upload, or without CI)
 
 ```sh
-npm run release    # after `npm version …`
+npm run release
 # android/app/build/outputs/bundle/release/app-release.aab  → upload in Play Console
 # android/app/build/outputs/apk/release/app-release.apk     → sideload to test the exact build
 ```
 
-- Signed with the **Play upload key**: `~/.android-keys/gently-upload.jks`, config in
-  `android/keystore.properties` (git-ignored, never commit). Play App Signing holds the real app key
+- Local signing: `android/keystore.properties` (git-ignored, never commit). Play App Signing holds the
+  real app key; the upload key can be reset through Play Console support
 - Store copy, Data safety answers: `docs/store-listing.md`. Privacy policy: `docs/privacy-policy.md`,
   published as a gist (URL in the file header); update the gist when the policy changes
 - Graphics: `npm run assets` (icons, feature graphic); `npm run screenshots` with

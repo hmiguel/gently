@@ -1,9 +1,9 @@
-import { BookUser } from 'lucide-react'
+import { BookUser, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import { FormScreen, FormSection, OptionList } from '../components/FormScreen'
 import { Button } from '../components/ui'
 import { useI18n } from '../i18n'
-import { countryName, describeRule, digitsOf, newRuleId, sameNumber, sameSchedule } from '../lib/rules'
+import { countryName, describeRule, digitsOf, formatClock, newRuleId, sameNumber, sameSchedule } from '../lib/rules'
 import type { Action, Direction, Rule, Schedule, Target } from '../plugins/callguard'
 import type { PickedContact } from '../plugins/contacts'
 
@@ -17,6 +17,10 @@ const ACTIONS: Action[] = ['block', 'allow']
 const DIRECTIONS: Direction[] = ['outgoing', 'incoming', 'both']
 const TARGETS: Target[] = ['number', 'anyone', 'international', 'hidden']
 const SCHEDULES = ['always', 'scheduled'] as const
+/** Every quarter hour as "HH:mm": the choices for a schedule's ends. */
+const QUARTERS = Array.from({ length: 96 }, (_, i) =>
+  `${String(Math.floor(i / 4)).padStart(2, '0')}:${String((i % 4) * 15).padStart(2, '0')}`,
+)
 /** A first schedule covers the night, the common case. */
 const NIGHT: Schedule = { from: '20:00', until: '07:00' }
 
@@ -194,15 +198,25 @@ export function RuleForm({
               {(['from', 'until'] as const).map((end) => (
                 <label key={end} className="block">
                   <span className="text-label text-ink/60">{t[end]}</span>
-                  <input
-                    type="time"
-                    required
-                    value={draft.schedule?.[end] ?? ''}
-                    onChange={(e) =>
-                      e.target.value && update({ schedule: { ...NIGHT, ...draft.schedule, [end]: e.target.value } })
-                    }
-                    className={`${inputClass} border-b-4 text-2xl font-bold tabular-nums`}
-                  />
+                  {/* Not <input type="time">: Android's WebView formats that by locale and ignores the 12/24-hour setting. */}
+                  <span className="relative block">
+                    <select
+                      value={draft.schedule?.[end]}
+                      onChange={(e) => update({ schedule: { ...NIGHT, ...draft.schedule, [end]: e.target.value } })}
+                      className={`${inputClass} appearance-none border-b-4 pr-6 text-2xl font-bold tabular-nums`}
+                    >
+                      {[...new Set([...QUARTERS, draft.schedule?.[end] ?? ''])].filter(Boolean).sort().map((hhmm) => (
+                        <option key={hhmm} value={hhmm}>
+                          {formatClock(hhmm, m.locale, hourCycle)}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      strokeWidth={3}
+                      className="pointer-events-none absolute right-0 top-1/2 size-5 -translate-y-1/2"
+                      aria-hidden
+                    />
+                  </span>
                 </label>
               ))}
             </div>

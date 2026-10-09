@@ -79,17 +79,20 @@ export const de: Messages = {
     direction: { outgoing: 'Ausgehend', incoming: 'Eingehend', both: 'Beide' },
     subject,
 
-    describe(rule: RuleText): string {
+    describe(rule: RuleText, window?: string): string {
+      const at = window ? ` ${window}` : ''
       const verb = rule.action === 'block' ? 'sperren' : 'erlauben'
       const which = { outgoing: 'ausgehenden ', incoming: 'eingehenden ', both: '' }[rule.direction]
-      if (rule.target === 'anyone') return `Alle ${which}Anrufe ${verb}.`
-      if (rule.target === 'international') return `Alle internationalen ${which}Anrufe ${verb}.`
-      if (rule.target === 'hidden') return `Anrufe von unterdrückten Nummern ${verb}.`
+      if (rule.target === 'anyone') return `Alle ${which}Anrufe${at} ${verb}.`
+      if (rule.target === 'international') return `Alle internationalen ${which}Anrufe${at} ${verb}.`
+      if (rule.target === 'hidden') return `Anrufe von unterdrückten Nummern${at} ${verb}.`
       const who = subject(rule)
-      if (rule.direction === 'outgoing') return `Anrufe an ${who} ${verb}.`
-      if (rule.direction === 'incoming') return `Anrufe von ${who} ${verb}.`
-      return `Anrufe mit ${who} ${verb}.`
+      if (rule.direction === 'outgoing') return `Anrufe an ${who}${at} ${verb}.`
+      if (rule.direction === 'incoming') return `Anrufe von ${who}${at} ${verb}.`
+      return `Anrufe mit ${who}${at} ${verb}.`
     },
+
+    between: (from: string, until: string) => `von ${from} bis ${until}`,
   },
 
   ruleForm: {
@@ -99,7 +102,7 @@ export const de: Messages = {
     save: 'Speichern',
     delete: 'Regel löschen',
     confirmDelete: 'Nochmal tippen zum Löschen',
-    sections: { action: 'Aktion', calls: 'Anrufe', who: 'Wer' },
+    sections: { action: 'Aktion', calls: 'Anrufe', who: 'Wer', when: 'Wann' },
     hiddenNote: 'Unterdrückte Nummern gibt es nur bei eingehenden Anrufen, daher gilt diese Regel für eingehende Anrufe.',
     fromContacts: 'Aus Kontakten wählen',
     phone: 'Telefonnummer',
@@ -125,6 +128,13 @@ export const de: Messages = {
       international: { title: 'International', description: `Nummern außerhalb von ${country}` },
       hidden: { title: 'Unterdrückte Nummern', description: 'Eingehende Anrufe ohne Rufnummer' },
     }),
+    schedules: {
+      always: { title: 'Immer', description: 'Tag und Nacht' },
+      scheduled: { title: 'Zeitplan', description: 'Nur zwischen zwei Uhrzeiten, z. B. nachts' },
+    },
+    from: 'Von',
+    until: 'Bis',
+    overnightNote: 'Endet am nächsten Tag, wenn „Bis“ früher als „Von“ ist.',
     yourCountry: 'deinem Land',
   },
 
@@ -181,7 +191,7 @@ export const de: Messages = {
     points: [
       {
         title: 'Regeln',
-        body: 'Jede Regel sperrt oder erlaubt Anrufe an eine Nummer, an alle, an internationale Nummern oder von unterdrückten Nummern.',
+        body: 'Jede Regel sperrt oder erlaubt Anrufe an eine Nummer, an alle, an internationale Nummern oder von unterdrückten Nummern. Außerdem lässt sich jede Regel auf bestimmte Uhrzeiten beschränken, z. B. von 20:00 bis 07:00.',
       },
       {
         title: 'Konkret gewinnt',

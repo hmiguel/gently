@@ -1,4 +1,5 @@
-import type { Rule } from '../plugins/callguard'
+import type { Messages } from '../i18n/en'
+import type { Rule, Schedule } from '../plugins/callguard'
 
 export const digitsOf = (n: string) => n.replace(/\D/g, '')
 
@@ -27,4 +28,22 @@ export function countryName(iso: string, locale: string, fallback: string) {
   } catch {
     return fallback
   }
+}
+
+/** "07:00" in the user's clock style: "07:00" on a 24-hour clock, "7:00 AM" on a 12-hour one. */
+export function formatClock(hhmm: string, locale: string, hourCycle: 'h12' | 'h23') {
+  const [h, min] = hhmm.split(':').map(Number)
+  const hour = hourCycle === 'h23' ? '2-digit' : 'numeric'
+  return new Intl.DateTimeFormat(locale, { hour, minute: '2-digit', hourCycle }).format(
+    new Date(2000, 0, 1, h, min),
+  )
+}
+
+export const sameSchedule = (a?: Schedule, b?: Schedule) => a?.from === b?.from && a?.until === b?.until
+
+/** The rule as a sentence, its time window (if any) in the user's clock style. */
+export function describeRule(m: Messages, rule: Rule | Omit<Rule, 'id'>, hourCycle: 'h12' | 'h23') {
+  const s = rule.schedule
+  const window = s && m.rules.between(formatClock(s.from, m.locale, hourCycle), formatClock(s.until, m.locale, hourCycle))
+  return m.rules.describe(rule, window)
 }

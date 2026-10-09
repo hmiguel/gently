@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,14 +17,17 @@ import java.util.UUID;
  * call services. Lives in native SharedPreferences so the services can read it
  * while the app (and its WebView) is closed.
  *
- * <p>A rule is {@code {id, action, direction, target, number?, label?}}:
+ * <p>A rule is {@code {id, action, direction, target, number?, label?, schedule?}}:
  * <ul>
  *   <li>action: "block" | "allow"</li>
  *   <li>direction: "outgoing" | "incoming" | "both"</li>
  *   <li>target: "number" (one number) | "anyone" | "international" (outside the SIM's
  *       country) | "hidden" (incoming, no caller ID)</li>
+ *   <li>schedule: {@code {from, until}} as local "HH:mm"; the rule only applies from
+ *       {@code from} (inclusive) to {@code until} (exclusive), crossing midnight when
+ *       {@code from} is later. Without one (or with from == until) it always applies.</li>
  * </ul>
- * For a given call, the most specific matching rule wins: number or hidden, then
+ * For a given call, the most specific matching active rule wins: number or hidden, then
  * international, then anyone. On a tie, block wins.
  */
 public final class RuleStore {
@@ -73,7 +77,10 @@ public final class RuleStore {
             .apply();
     }
 
-    /** Whether any rule needs the given call direction intercepted. */
+    /**
+     * Whether any rule needs the given call direction intercepted. Scheduled rules count
+     * all day: the OS has to keep routing calls here for when their window opens.
+     */
     public boolean needs(String direction) {
         JSONArray rules = getRules();
         for (int i = 0; i < rules.length(); i++) {
@@ -93,6 +100,12 @@ public final class RuleStore {
     }
 
     private boolean shouldBlock(String direction, String number) {
+        Calendar now = Calendar.getInstance();
+        return shouldBlock(direction, number, now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE));
+    }
+
+    /** {@code minuteOfDay} is local time, 0..1439. */
+    boolean shouldBlock(String direction, String number, int minuteOfDay) {
         if (!isEnabled()) return false;
         boolean hidden = number == null || digits(number).isEmpty();
         // Only worked out if an international rule applies to this direction.
@@ -104,6 +117,7 @@ public final class RuleStore {
         for (int i = 0; i < rules.length(); i++) {
             JSONObject rule = rules.optJSONObject(i);
             if (rule == null || !covers(rule.optString("direction"), direction)) continue;
+            if (!activeAt(rule, minuteOfDay)) continue;
 
             if (international == null && TARGET_INTERNATIONAL.equals(rule.optString("target"))) {
                 international = !hidden && International.isInternational(context, number);
@@ -134,6 +148,31 @@ public final class RuleStore {
                 return !hidden && sameNumber(number, rule.optString("number")) ? 2 : -1;
             default:
                 return -1;
+        }
+    }
+
+    /** Whether the rule's schedule (if any) includes this local minute of the day. */
+    static boolean activeAt(JSONObject rule, int minuteOfDay) {
+        JSONObject schedule = rule.optJSONObject("schedule");
+        if (schedule == null) return true;
+        int from = minutes(schedule.optString("from"));
+        int until = minutes(schedule.optString("until"));
+        if (from < 0 || until < 0 || from == until) return true;
+        return from < until
+            ? minuteOfDay >= from && minuteOfDay < until
+            : minuteOfDay >= from || minuteOfDay < until;
+    }
+
+    /** "HH:mm" to minutes since midnight; -1 if malformed. */
+    private static int minutes(String hhmm) {
+        String[] parts = hhmm.split(":");
+        if (parts.length != 2) return -1;
+        try {
+            int h = Integer.parseInt(parts[0]);
+            int m = Integer.parseInt(parts[1]);
+            return h >= 0 && h < 24 && m >= 0 && m < 60 ? h * 60 + m : -1;
+        } catch (NumberFormatException e) {
+            return -1;
         }
     }
 

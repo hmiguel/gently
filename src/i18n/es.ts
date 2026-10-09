@@ -79,17 +79,20 @@ export const es: Messages = {
     direction: { outgoing: 'Salientes', incoming: 'Entrantes', both: 'Ambas' },
     subject,
 
-    describe(rule: RuleText): string {
+    describe(rule: RuleText, window?: string): string {
+      const at = window ? ` ${window}` : ''
       const verb = rule.action === 'block' ? 'Bloquear' : 'Permitir'
       const which = { outgoing: ' salientes', incoming: ' entrantes', both: '' }[rule.direction]
-      if (rule.target === 'anyone') return `${verb} todas las llamadas${which}.`
-      if (rule.target === 'international') return `${verb} todas las llamadas internacionales${which}.`
-      if (rule.target === 'hidden') return `${verb} llamadas de números ocultos.`
+      if (rule.target === 'anyone') return `${verb} todas las llamadas${which}${at}.`
+      if (rule.target === 'international') return `${verb} todas las llamadas internacionales${which}${at}.`
+      if (rule.target === 'hidden') return `${verb} llamadas de números ocultos${at}.`
       const who = subject(rule)
-      if (rule.direction === 'outgoing') return `${verb} llamadas a ${who}.`
-      if (rule.direction === 'incoming') return `${verb} llamadas de ${who}.`
-      return `${verb} llamadas con ${who}.`
+      if (rule.direction === 'outgoing') return `${verb} llamadas a ${who}${at}.`
+      if (rule.direction === 'incoming') return `${verb} llamadas de ${who}${at}.`
+      return `${verb} llamadas con ${who}${at}.`
     },
+
+    between: (from: string, until: string) => `de ${from} a ${until}`,
   },
 
   ruleForm: {
@@ -99,7 +102,7 @@ export const es: Messages = {
     save: 'Guardar cambios',
     delete: 'Eliminar regla',
     confirmDelete: 'Toca otra vez para eliminar',
-    sections: { action: 'Acción', calls: 'Llamadas', who: 'Quién' },
+    sections: { action: 'Acción', calls: 'Llamadas', who: 'Quién', when: 'Cuándo' },
     hiddenNote: 'Los números ocultos solo existen en llamadas entrantes, así que esta regla se aplica a las llamadas entrantes.',
     fromContacts: 'Elegir de los contactos',
     phone: 'Número de teléfono',
@@ -125,6 +128,13 @@ export const es: Messages = {
       international: { title: 'Internacional', description: `Números fuera de ${country}` },
       hidden: { title: 'Números ocultos', description: 'Llamadas entrantes sin identificación' },
     }),
+    schedules: {
+      always: { title: 'Siempre', description: 'De día y de noche' },
+      scheduled: { title: 'Con horario', description: 'Solo entre dos horas, por ejemplo de noche' },
+    },
+    from: 'Desde',
+    until: 'Hasta',
+    overnightNote: 'Termina al día siguiente si «Hasta» es antes que «Desde».',
     yourCountry: 'tu país',
   },
 
@@ -181,7 +191,7 @@ export const es: Messages = {
     points: [
       {
         title: 'Reglas',
-        body: 'Cada regla bloquea o permite llamadas a un número, a cualquiera, a números internacionales o de números ocultos.',
+        body: 'Cada regla bloquea o permite llamadas a un número, a cualquiera, a números internacionales o de números ocultos. Cualquier regla puede limitarse a ciertas horas, por ejemplo de 20:00 a 07:00.',
       },
       {
         title: 'Lo concreto gana',

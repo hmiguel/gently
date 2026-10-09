@@ -79,17 +79,20 @@ export const pt: Messages = {
     direction: { outgoing: 'Efetuadas', incoming: 'Recebidas', both: 'Ambas' },
     subject,
 
-    describe(rule: RuleText): string {
+    describe(rule: RuleText, window?: string): string {
+      const at = window ? ` ${window}` : ''
       const verb = rule.action === 'block' ? 'Bloquear' : 'Permitir'
       const which = { outgoing: ' efetuadas', incoming: ' recebidas', both: '' }[rule.direction]
-      if (rule.target === 'anyone') return `${verb} todas as chamadas${which}.`
-      if (rule.target === 'international') return `${verb} todas as chamadas internacionais${which}.`
-      if (rule.target === 'hidden') return `${verb} chamadas de números anónimos.`
+      if (rule.target === 'anyone') return `${verb} todas as chamadas${which}${at}.`
+      if (rule.target === 'international') return `${verb} todas as chamadas internacionais${which}${at}.`
+      if (rule.target === 'hidden') return `${verb} chamadas de números anónimos${at}.`
       const who = subject(rule)
-      if (rule.direction === 'outgoing') return `${verb} chamadas para ${who}.`
-      if (rule.direction === 'incoming') return `${verb} chamadas de ${who}.`
-      return `${verb} chamadas de e para ${who}.`
+      if (rule.direction === 'outgoing') return `${verb} chamadas para ${who}${at}.`
+      if (rule.direction === 'incoming') return `${verb} chamadas de ${who}${at}.`
+      return `${verb} chamadas de e para ${who}${at}.`
     },
+
+    between: (from: string, until: string) => `das ${from} às ${until}`,
   },
 
   ruleForm: {
@@ -99,7 +102,7 @@ export const pt: Messages = {
     save: 'Guardar alterações',
     delete: 'Apagar regra',
     confirmDelete: 'Toque de novo para apagar',
-    sections: { action: 'Ação', calls: 'Chamadas', who: 'Quem' },
+    sections: { action: 'Ação', calls: 'Chamadas', who: 'Quem', when: 'Quando' },
     hiddenNote: 'Os números anónimos só existem em chamadas recebidas, por isso esta regra aplica-se às chamadas recebidas.',
     fromContacts: 'Escolher dos contactos',
     phone: 'Número de telefone',
@@ -125,6 +128,13 @@ export const pt: Messages = {
       international: { title: 'Internacional', description: `Números fora de ${country}` },
       hidden: { title: 'Números anónimos', description: 'Chamadas recebidas sem identificação' },
     }),
+    schedules: {
+      always: { title: 'Sempre', description: 'De dia e de noite' },
+      scheduled: { title: 'Com horário', description: 'Só entre duas horas, por exemplo à noite' },
+    },
+    from: 'De',
+    until: 'Até',
+    overnightNote: 'Termina no dia seguinte quando «Até» é mais cedo que «De».',
     yourCountry: 'o seu país',
   },
 
@@ -181,7 +191,7 @@ export const pt: Messages = {
     points: [
       {
         title: 'Regras',
-        body: 'Cada regra bloqueia ou permite chamadas para um número, para qualquer pessoa, para números internacionais ou de números anónimos.',
+        body: 'Cada regra bloqueia ou permite chamadas para um número, para qualquer pessoa, para números internacionais ou de números anónimos. Qualquer regra pode valer só a certas horas, por exemplo das 20:00 às 07:00.',
       },
       {
         title: 'O específico vence',

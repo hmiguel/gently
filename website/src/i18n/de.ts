@@ -82,7 +82,7 @@ export const de: Site = {
         a: [
           [
             'Öffne Gently und leg einen 6-stelligen Zugangscode an.',
-            'Tippe im Tab Regeln auf Neue Regel: wähle Sperren oder Erlauben, welche Anrufe und wer.',
+            'Tippe im Tab Regeln auf Neue Regel: wähle Sperren oder Erlauben, welche Anrufe, wer und wann (immer oder nur zwischen zwei Uhrzeiten).',
             'Tippe in der Statusanzeige auf Zugriff erlauben und wähle Gently im Android-Dialog.',
             'Schalte die Sperre ein.',
           ],

@@ -85,22 +85,26 @@ export const en = {
     subject,
 
     /** The rule as one plain sentence, e.g. "Block calls to Mom." */
-    describe(rule: RuleText): string {
+    describe(rule: RuleText, window?: string): string {
+      const at = window ? ` ${window}` : ''
       const verb = rule.action === 'block' ? 'Block' : 'Allow'
       if (rule.target === 'anyone') {
-        return rule.direction === 'both' ? `${verb} all calls.` : `${verb} all ${rule.direction} calls.`
+        return rule.direction === 'both' ? `${verb} all calls${at}.` : `${verb} all ${rule.direction} calls${at}.`
       }
       if (rule.target === 'international') {
         return rule.direction === 'both'
-          ? `${verb} all international calls.`
-          : `${verb} all international ${rule.direction} calls.`
+          ? `${verb} all international calls${at}.`
+          : `${verb} all international ${rule.direction} calls${at}.`
       }
-      if (rule.target === 'hidden') return `${verb} calls from hidden numbers.`
+      if (rule.target === 'hidden') return `${verb} calls from hidden numbers${at}.`
       const who = subject(rule)
-      if (rule.direction === 'outgoing') return `${verb} calls to ${who}.`
-      if (rule.direction === 'incoming') return `${verb} calls from ${who}.`
-      return `${verb} calls to and from ${who}.`
+      if (rule.direction === 'outgoing') return `${verb} calls to ${who}${at}.`
+      if (rule.direction === 'incoming') return `${verb} calls from ${who}${at}.`
+      return `${verb} calls to and from ${who}${at}.`
     },
+
+    /** A rule's time window, for describe(): e.g. "from 20:00 to 07:00". */
+    between: (from: string, until: string) => `from ${from} to ${until}`,
   },
 
   ruleForm: {
@@ -110,7 +114,7 @@ export const en = {
     save: 'Save changes',
     delete: 'Delete rule',
     confirmDelete: 'Tap again to delete',
-    sections: { action: 'Action', calls: 'Calls', who: 'Who' },
+    sections: { action: 'Action', calls: 'Calls', who: 'Who', when: 'When' },
     hiddenNote: 'Hidden numbers only exist on incoming calls, so this rule applies to incoming calls.',
     fromContacts: 'Choose from contacts',
     phone: 'Phone number',
@@ -136,6 +140,13 @@ export const en = {
       international: { title: 'International', description: `Numbers outside ${country}` },
       hidden: { title: 'Hidden numbers', description: 'Incoming calls with no caller ID' },
     }),
+    schedules: {
+      always: { title: 'Always', description: 'Day and night' },
+      scheduled: { title: 'Scheduled', description: 'Only between two times, like at night' },
+    },
+    from: 'From',
+    until: 'Until',
+    overnightNote: 'Ends the next day when Until is earlier than From.',
     yourCountry: 'your country',
   },
 
@@ -192,7 +203,7 @@ export const en = {
     points: [
       {
         title: 'Rules',
-        body: 'Each rule blocks or allows calls to a number, to anyone, to international numbers, or from hidden numbers.',
+        body: 'Each rule blocks or allows calls to a number, to anyone, to international numbers, or from hidden numbers. Any rule can be limited to certain hours, like 20:00 to 07:00.',
       },
       {
         title: 'Specific wins',

@@ -79,17 +79,20 @@ export const fr: Messages = {
     direction: { outgoing: 'Sortants', incoming: 'Entrants', both: 'Les deux' },
     subject,
 
-    describe(rule: RuleText): string {
+    describe(rule: RuleText, window?: string): string {
+      const at = window ? ` ${window}` : ''
       const verb = rule.action === 'block' ? 'Bloquer' : 'Autoriser'
       const which = { outgoing: ' sortants', incoming: ' entrants', both: '' }[rule.direction]
-      if (rule.target === 'anyone') return `${verb} tous les appels${which}.`
-      if (rule.target === 'international') return `${verb} tous les appels internationaux${which}.`
-      if (rule.target === 'hidden') return `${verb} les appels des numéros masqués.`
+      if (rule.target === 'anyone') return `${verb} tous les appels${which}${at}.`
+      if (rule.target === 'international') return `${verb} tous les appels internationaux${which}${at}.`
+      if (rule.target === 'hidden') return `${verb} les appels des numéros masqués${at}.`
       const who = subject(rule)
-      if (rule.direction === 'outgoing') return `${verb} les appels vers ${who}.`
-      if (rule.direction === 'incoming') return `${verb} les appels de ${who}.`
-      return `${verb} les appels avec ${who}.`
+      if (rule.direction === 'outgoing') return `${verb} les appels vers ${who}${at}.`
+      if (rule.direction === 'incoming') return `${verb} les appels de ${who}${at}.`
+      return `${verb} les appels avec ${who}${at}.`
     },
+
+    between: (from: string, until: string) => `de ${from} à ${until}`,
   },
 
   ruleForm: {
@@ -99,7 +102,7 @@ export const fr: Messages = {
     save: 'Enregistrer',
     delete: 'Supprimer la règle',
     confirmDelete: 'Touchez encore pour supprimer',
-    sections: { action: 'Action', calls: 'Appels', who: 'Qui' },
+    sections: { action: 'Action', calls: 'Appels', who: 'Qui', when: 'Quand' },
     hiddenNote: "Les numéros masqués n'existent que pour les appels entrants : cette règle s'applique donc aux appels entrants.",
     fromContacts: 'Choisir dans les contacts',
     phone: 'Numéro de téléphone',
@@ -125,6 +128,13 @@ export const fr: Messages = {
       international: { title: 'International', description: `Numéros hors de ${country}` },
       hidden: { title: 'Numéros masqués', description: 'Appels entrants sans identification' },
     }),
+    schedules: {
+      always: { title: 'Toujours', description: 'Jour et nuit' },
+      scheduled: { title: 'Programmée', description: 'Seulement entre deux heures, par exemple la nuit' },
+    },
+    from: 'De',
+    until: "Jusqu'à",
+    overnightNote: "Se termine le lendemain si « Jusqu'à » est plus tôt que « De ».",
     yourCountry: 'votre pays',
   },
 
@@ -181,7 +191,7 @@ export const fr: Messages = {
     points: [
       {
         title: 'Règles',
-        body: 'Chaque règle bloque ou autorise les appels vers un numéro, vers tout le monde, vers les numéros internationaux ou depuis les numéros masqués.',
+        body: 'Chaque règle bloque ou autorise les appels vers un numéro, vers tout le monde, vers les numéros internationaux ou depuis les numéros masqués. Chaque règle peut se limiter à certaines heures, par exemple de 20:00 à 07:00.',
       },
       {
         title: 'Le précis gagne',

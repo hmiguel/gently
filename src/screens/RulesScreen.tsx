@@ -1,7 +1,8 @@
-import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, ChevronRight, Plus } from 'lucide-react'
+import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, ChevronRight, Clock, Plus } from 'lucide-react'
 import { Button, ScreenHeader } from '../components/ui'
 import { useI18n } from '../i18n'
 import { tap } from '../lib/haptics'
+import { describeRule, formatClock } from '../lib/rules'
 import type { Direction, Rule } from '../plugins/callguard'
 
 const DIRECTION_ICON: Record<Direction, typeof ArrowUpRight> = {
@@ -20,7 +21,7 @@ export function RulesScreen({
   onOpen: (id: string) => void
   onCreate: () => void
 }) {
-  const { m } = useI18n()
+  const { m, hourCycle } = useI18n()
   return (
     <>
       <ScreenHeader index="02" label={m.rules.label} title={m.rules.title} />
@@ -41,7 +42,7 @@ export function RulesScreen({
                 <li key={rule.id}>
                   <button
                     type="button"
-                    aria-label={m.rules.describe(rule)}
+                    aria-label={describeRule(m, rule, hourCycle)}
                     onClick={() => {
                       tap()
                       onOpen(rule.id)
@@ -68,6 +69,13 @@ export function RulesScreen({
                       {rule.target === 'number' && rule.label && (
                         <span className="block truncate text-sm font-medium tabular-nums opacity-60">
                           {rule.number}
+                        </span>
+                      )}
+                      {rule.schedule && (
+                        <span className="mt-1 flex items-center gap-1.5 text-sm font-bold tabular-nums">
+                          <Clock strokeWidth={2.5} className="size-3.5" aria-hidden />
+                          {formatClock(rule.schedule.from, m.locale, hourCycle)}–
+                          {formatClock(rule.schedule.until, m.locale, hourCycle)}
                         </span>
                       )}
                     </span>

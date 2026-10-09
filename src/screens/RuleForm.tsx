@@ -3,8 +3,8 @@ import { useState } from 'react'
 import { FormScreen, FormSection, OptionList } from '../components/FormScreen'
 import { Button } from '../components/ui'
 import { useI18n } from '../i18n'
-import { countryName, digitsOf, newRuleId, sameNumber } from '../lib/rules'
-import type { Action, Direction, Rule, Target } from '../plugins/callguard'
+import { countryName, describeRule, digitsOf, newRuleId, sameNumber, sameSchedule } from '../lib/rules'
+import type { Action, Direction, Rule, Schedule, Target } from '../plugins/callguard'
 import type { PickedContact } from '../plugins/contacts'
 
 const inputClass =
@@ -16,6 +16,9 @@ const BLANK: Omit<Rule, 'id'> = { action: 'block', direction: 'outgoing', target
 const ACTIONS: Action[] = ['block', 'allow']
 const DIRECTIONS: Direction[] = ['outgoing', 'incoming', 'both']
 const TARGETS: Target[] = ['number', 'anyone', 'international', 'hidden']
+const SCHEDULES = ['always', 'scheduled'] as const
+/** A first schedule covers the night, the common case. */
+const NIGHT: Schedule = { from: '20:00', until: '07:00' }
 
 function options<T extends string>(values: T[], text: Record<T, { title: string; description: string }>) {
   return values.map((value) => ({ value, ...text[value] }))
@@ -44,7 +47,7 @@ export function RuleForm({
   onPickContact: () => Promise<PickedContact | null>
   onClose: () => void
 }) {
-  const { m } = useI18n()
+  const { m, hourCycle } = useI18n()
   const t = m.ruleForm
   const [draft, setDraft] = useState<Omit<Rule, 'id'>>(rule ?? BLANK)
   const [error, setError] = useState<string | null>(null)
@@ -67,10 +70,12 @@ export function RuleForm({
       delete final.number
       delete final.label
     }
+    if (!final.schedule) delete final.schedule
     const duplicate = others.some(
       (o) =>
         o.target === final.target &&
         o.direction === final.direction &&
+        sameSchedule(o.schedule, final.schedule) &&
         (final.target !== 'number' || sameNumber(o.number ?? '', final.number ?? '')),
     )
     if (duplicate) return setError(t.errors.duplicate)
@@ -90,7 +95,7 @@ export function RuleForm({
     <FormScreen
       index="02"
       label={rule ? t.editRule : t.newRule}
-      title={m.rules.describe(draft.target === 'hidden' ? { ...draft, direction: 'incoming' } : draft)}
+      title={describeRule(m, draft.target === 'hidden' ? { ...draft, direction: 'incoming' } : draft, hourCycle)}
       onClose={onClose}
       actions={
         <>
@@ -172,6 +177,38 @@ export function RuleForm({
                 className={`${inputClass} border-b-2 text-lg font-medium`}
               />
             </label>
+          </div>
+        )}
+      </FormSection>
+
+      <FormSection index="2.4" label={t.sections.when}>
+        <OptionList
+          label={t.sections.when}
+          options={options([...SCHEDULES], t.schedules)}
+          value={draft.schedule ? 'scheduled' : 'always'}
+          onChange={(when) => update({ schedule: when === 'scheduled' ? (draft.schedule ?? NIGHT) : undefined })}
+        />
+        {draft.schedule && (
+          <div className="swiss-diagonal space-y-4 border-t-2 border-ink bg-muted px-6 py-6">
+            <div className="grid grid-cols-2 gap-6">
+              {(['from', 'until'] as const).map((end) => (
+                <label key={end} className="block">
+                  <span className="text-label text-ink/60">{t[end]}</span>
+                  <input
+                    type="time"
+                    required
+                    value={draft.schedule?.[end] ?? ''}
+                    onChange={(e) =>
+                      e.target.value && update({ schedule: { ...NIGHT, ...draft.schedule, [end]: e.target.value } })
+                    }
+                    className={`${inputClass} border-b-4 text-2xl font-bold tabular-nums`}
+                  />
+                </label>
+              ))}
+            </div>
+            {draft.schedule.from > draft.schedule.until && (
+              <p className="text-sm font-medium text-ink/60">{t.overnightNote}</p>
+            )}
           </div>
         )}
       </FormSection>

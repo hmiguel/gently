@@ -95,7 +95,7 @@ export const en = {
         a: [
           [
             'Open Gently and create a 6-digit access code.',
-            'On the Rules tab, tap New rule: choose Block or Allow, which calls, and who.',
+            'On the Rules tab, tap New rule: choose Block or Allow, which calls, who, and when (always, or only between two times).',
             'On the Status screen, tap Grant access and choose Gently in the Android dialog.',
             'Turn blocking on.',
           ],

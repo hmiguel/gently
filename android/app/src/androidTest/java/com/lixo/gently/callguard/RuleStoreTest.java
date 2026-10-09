@@ -39,6 +39,14 @@ public class RuleStoreTest {
         return r;
     }
 
+    private static JSONObject scheduled(JSONObject rule, String from, String until) throws Exception {
+        return rule.put("schedule", new JSONObject().put("from", from).put("until", until));
+    }
+
+    private static int at(int hour, int minute) {
+        return hour * 60 + minute;
+    }
+
     private void save(JSONObject... rules) {
         JSONArray list = new JSONArray();
         for (JSONObject r : rules) list.put(r);
@@ -99,5 +107,56 @@ public class RuleStoreTest {
         save(rule("block", "outgoing", "anyone", null), rule("allow", "outgoing", "international", null));
         assertFalse(store.shouldBlockOutgoing(UK));
         assertTrue(store.shouldBlockOutgoing(LOCAL));
+    }
+
+    @Test
+    public void sameDayWindow() throws Exception {
+        JSONObject r = scheduled(rule("block", "both", "anyone", null), "09:00", "17:30");
+        assertFalse(RuleStore.activeAt(r, at(8, 59)));
+        assertTrue(RuleStore.activeAt(r, at(9, 0)));
+        assertTrue(RuleStore.activeAt(r, at(17, 29)));
+        assertFalse("until is exclusive", RuleStore.activeAt(r, at(17, 30)));
+    }
+
+    @Test
+    public void overnightWindow() throws Exception {
+        JSONObject r = scheduled(rule("block", "both", "anyone", null), "20:00", "07:00");
+        assertFalse(RuleStore.activeAt(r, at(19, 59)));
+        assertTrue(RuleStore.activeAt(r, at(20, 0)));
+        assertTrue(RuleStore.activeAt(r, at(23, 59)));
+        assertTrue(RuleStore.activeAt(r, at(0, 0)));
+        assertTrue(RuleStore.activeAt(r, at(6, 59)));
+        assertFalse(RuleStore.activeAt(r, at(7, 0)));
+        assertFalse(RuleStore.activeAt(r, at(12, 0)));
+    }
+
+    @Test
+    public void noScheduleOrEmptyWindowIsAlwaysOn() throws Exception {
+        assertTrue(RuleStore.activeAt(rule("block", "both", "anyone", null), at(3, 0)));
+        assertTrue(RuleStore.activeAt(scheduled(rule("block", "both", "anyone", null), "08:00", "08:00"), at(3, 0)));
+    }
+
+    @Test
+    public void scheduledRuleOnlyBlocksInsideItsWindow() throws Exception {
+        save(scheduled(rule("block", "incoming", "anyone", null), "20:00", "07:00"));
+        assertTrue(store.shouldBlock(RuleStore.INCOMING, LOCAL, at(22, 0)));
+        assertFalse(store.shouldBlock(RuleStore.INCOMING, LOCAL, at(12, 0)));
+        assertTrue("still intercepts incoming calls outside the window", store.needs(RuleStore.INCOMING));
+    }
+
+    @Test
+    public void alwaysOnAllowBeatsScheduledBlockEveryone() throws Exception {
+        save(scheduled(rule("block", "incoming", "anyone", null), "20:00", "07:00"),
+            rule("allow", "incoming", "number", MOM));
+        assertFalse(store.shouldBlock(RuleStore.INCOMING, MOM, at(23, 0)));
+        assertTrue(store.shouldBlock(RuleStore.INCOMING, LOCAL, at(23, 0)));
+    }
+
+    @Test
+    public void outsideItsWindowAScheduledAllowFallsThrough() throws Exception {
+        save(rule("block", "outgoing", "anyone", null),
+            scheduled(rule("allow", "outgoing", "number", MOM), "18:00", "20:00"));
+        assertFalse(store.shouldBlock(RuleStore.OUTGOING, MOM, at(19, 0)));
+        assertTrue(store.shouldBlock(RuleStore.OUTGOING, MOM, at(9, 0)));
     }
 }

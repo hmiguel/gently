@@ -11,7 +11,16 @@ export type Action = 'block' | 'allow'
 export type Target = 'number' | 'anyone' | 'international' | 'hidden'
 
 /**
- * One rule. For a given call the most specific matching rule wins (number or
+ * Local "HH:mm" times. The rule applies from `from` (inclusive) until `until`
+ * (exclusive), crossing midnight when `from` is later: 20:00–07:00 covers the night.
+ */
+export interface Schedule {
+  from: string
+  until: string
+}
+
+/**
+ * One rule. For a given call the most specific matching active rule wins (number or
  * hidden, then international, then anyone); on a tie, block wins. Mirrors RuleStore.java.
  */
 export interface Rule {
@@ -22,6 +31,8 @@ export interface Rule {
   /** Only for target 'number'. */
   number?: string
   label?: string
+  /** Only applies during this window; always applies without one. */
+  schedule?: Schedule
 }
 
 export interface Rules {

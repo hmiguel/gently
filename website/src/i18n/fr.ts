@@ -82,7 +82,7 @@ export const fr: Site = {
         a: [
           [
             "Ouvrez Gently et créez un code d'accès à 6 chiffres.",
-            'Dans l’onglet Règles, touchez Nouvelle règle : choisissez Bloquer ou Autoriser, quels appels et qui.',
+            'Dans l’onglet Règles, touchez Nouvelle règle : choisissez Bloquer ou Autoriser, quels appels, qui et quand (toujours, ou seulement entre deux heures).',
             "Sur l'écran État, touchez Donner l'accès et choisissez Gently dans la fenêtre d'Android.",
             'Activez le blocage.',
           ],
